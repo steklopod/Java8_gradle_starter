@@ -70,7 +70,7 @@ public class DataProvider {
         hikariConfig.setIdleTimeout(idleTimeOut);
         hikariConfig.setConnectionTestQuery("SELECT 1");
         hikariConfig.setLeakDetectionThreshold(15000);
-        hikariConfig.setPoolName("Hikari-test");
+//        hikariConfig.setPoolName("Hikari-test");
         /**
          * Это свойство определяет, будет ли HikariCP изолировать внутренние запросы пула, такие как тест живой связи,
          * в своей собственной транзакции. Поскольку они обычно являются запросами только для чтения,
