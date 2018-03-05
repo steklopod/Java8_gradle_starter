@@ -1,0 +1,55 @@
+buildscript {
+	ext {
+		springBootVersion = '2.0.1.BUILD-SNAPSHOT'
+	}
+	repositories {
+		mavenCentral()
+		maven { url "https://repo.spring.io/snapshot" }
+		maven { url "https://repo.spring.io/milestone" }
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'war'
+
+group = 'ru.steklopod'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+	mavenCentral()
+	maven { url "https://repo.spring.io/snapshot" }
+	maven { url "https://repo.spring.io/milestone" }
+}
+
+configurations {
+	providedRuntime
+}
+
+dependencies {
+	compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '2.0.0.RELEASE'
+
+	compile('org.springframework.boot:spring-boot-starter-actuator')
+	compile('org.springframework.boot:spring-boot-starter-cache')
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+	compile('org.springframework.boot:spring-boot-starter-data-rest')
+	compile('org.springframework.boot:spring-boot-starter-security')
+	compile('org.springframework.boot:spring-boot-starter-web')
+	compile('org.springframework.boot:spring-boot-starter-webflux')
+	compile('org.springframework.session:spring-session-core')
+	runtime('org.springframework.boot:spring-boot-devtools')
+	runtime('org.postgresql:postgresql')
+	compileOnly('org.springframework.boot:spring-boot-configuration-processor')
+	compileOnly('org.projectlombok:lombok')
+	providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+	testCompile('org.springframework.boot:spring-boot-starter-test')
+	testCompile('io.projectreactor:reactor-test')
+	testCompile('org.springframework.security:spring-security-test')
+}
