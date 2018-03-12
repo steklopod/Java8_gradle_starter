@@ -1,6 +1,7 @@
 package ru.steklopod.java8;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.stoloto.connection.DataProvider;
+import ru.steklopod.connection.DataProvider;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ContextConfiguration(classes = {DataProvider.class})
+@Disabled
 class OptionalOrElse {
     private static Logger logger = LoggerFactory.getLogger(OptionalOrElse.class);
 

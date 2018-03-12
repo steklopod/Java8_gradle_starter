@@ -24,6 +24,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @RunWith(JUnitPlatform.class)
 @IncludeTags("production")
 @ExcludeTags("ex")
+
 //@ContextConfiguration(classes = {DataProvider.class})
 class InitJunit5 {
     private static Logger logger = LoggerFactory.getLogger(InitJunit5.class);

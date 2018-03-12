@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.steklopod.connection.DataProvider;
 import ru.stoloto.connection.DataProvider;
 
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
+@
 @RunWith(JUnitPlatform.class)
 @ContextConfiguration(classes = {DataProvider.class})
 class Factory {
