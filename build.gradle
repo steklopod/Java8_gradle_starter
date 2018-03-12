@@ -6,7 +6,6 @@ buildscript {
 		mavenCentral()
 		maven { url "https://repo.spring.io/snapshot" }
 		maven { url "https://repo.spring.io/milestone" }
-//		maven { url "jitpack.io" }
 	}
 	dependencies {
 		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
@@ -27,7 +26,7 @@ apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'com.kncept.junit5.reporter'
 apply plugin: 'war'
 
-group = 'ru.steklopod'
+group = 'ru.stoloto'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 1.8
 
@@ -44,7 +43,6 @@ repositories {
 	mavenCentral()
 	maven { url "https://repo.spring.io/snapshot" }
 	maven { url "https://repo.spring.io/milestone" }
-//	maven { url "jitpack.io" }
 }
 
 //configurations {
@@ -52,49 +50,44 @@ repositories {
 //}
 
 dependencies {
-//	compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '2.0.0.RELEASE'
 	compile("org.springframework.boot:spring-boot-starter")
-
 	compile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-
-	compileOnly("org.projectlombok:lombok:${lombokVersion}")
-
 	compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.2.3'
 	compile group: 'com.zaxxer', name: 'HikariCP', version: '2.7.8'
-
 	compile('org.springframework.boot:spring-boot-starter-data-jpa')
 	compile('org.springframework.boot:spring-boot-starter-data-rest')
 	compile('org.springframework.boot:spring-boot-starter-web')
-
 	compile group: 'name.falgout.jeffrey.testing.junit5', name: 'mockito-extension', version: '1.0.0'
-
-//	compile('org.springframework.boot:spring-boot-starter-security')
-//	compile('org.springframework.boot:spring-boot-starter-actuator')
-//	compile('org.springframework.boot:spring-boot-starter-cache')
-//	compile('org.springframework.session:spring-session-core')
-//	compile('org.springframework.boot:spring-boot-starter-webflux')
-	runtime('org.springframework.boot:spring-boot-devtools')
+	compile("org.projectlombok:lombok:${lombokVersion}")
 
 	compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 
-//	providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+	runtime('org.springframework.boot:spring-boot-devtools')
+	testCompile(
+			'org.springframework.boot:spring-boot-starter-test',
+			"org.assertj:assertj-core:${assertJVersion}",
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-//	testCompile('io.projectreactor:reactor-test')
-//	testCompile('org.springframework.security:spring-security-test')
-
-//	TODO-
-	testCompile("org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}")
-	testCompile("org.junit.jupiter:junit-jupiter-migrationsupport:${junitJupiterVersion}")
-	testCompile("org.junit.platform:junit-platform-runner:${junitPlatformVersion}")
-	testCompile("org.assertj:assertj-core:${assertJVersion}")
-	testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-	testRuntime("org.junit.vintage:junit-vintage-engine:${junitVintageVersion}")
-
+			"org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}",
+			"org.junit.jupiter:junit-jupiter-migrationsupport:${junitJupiterVersion}",
+			"org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}",
+			"org.junit.platform:junit-platform-runner:${junitPlatformVersion}",
+			"org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
+	)
 
 //	testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.0.3'
 
 	testRuntime group: 'junit', name: 'junit', version: '4.12'
 	testRuntime group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
+
+
+//	compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '2.0.0.RELEASE'
+//	compile('org.springframework.boot:spring-boot-starter-security')
+//	compile('org.springframework.boot:spring-boot-starter-actuator')
+//	compile('org.springframework.boot:spring-boot-starter-cache')
+//	compile('org.springframework.session:spring-session-core')
+//	compile('org.springframework.boot:spring-boot-starter-webflux')
+//	providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+//	testCompile('io.projectreactor:reactor-test')
+//	testCompile('org.springframework.security:spring-security-test')
 
 }
