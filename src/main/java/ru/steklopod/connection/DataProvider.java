@@ -2,6 +2,7 @@ package ru.steklopod.connection;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.*;
@@ -24,9 +25,7 @@ import java.util.Properties;
 
 @Configuration
 @ComponentScan(basePackages = "ru.steklopod")
-@EnableJpaRepositories(basePackages = "ru.steklopod")
-@ConfigurationProperties(value = "application.properties")
-@PropertySource("classpath:application.properties")
+@EnableJpaRepositories(basePackages = "ru.steklopod.repositories")
 @EnableTransactionManagement
 public class DataProvider {
 
@@ -55,7 +54,7 @@ public class DataProvider {
     private int lifetime;
 
 
-    @Bean(name = "Face")
+    @Bean(name = "HikariDS")
     @Primary
     public DataSource dataSource() {
         HikariConfig hikariConfig = new HikariConfig();
@@ -86,7 +85,7 @@ public class DataProvider {
          * пока пул не будет возобновлен. По умолчанию: false
          */
 
-//        hikariConfig.setAllowPoolSuspension(true);
+        hikariConfig.setAllowPoolSuspension(true);
         /**
          Этот параметр задает количество подготовленных операторов, которые драйвер Posrgres будет кэшировать для каждого соединения.
          Значение по умолчанию - консервативное = 25. Рекомендуется установить это значение между 250-500.
@@ -113,7 +112,8 @@ public class DataProvider {
         return ds;
     }
 
-    @Bean(name = "myJpaVendorAdapter")
+    @Bean
+//            (name = "myJpaVendorAdapter")
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
         hibernateJpaVendorAdapter.setShowSql(true);
@@ -122,33 +122,37 @@ public class DataProvider {
         return hibernateJpaVendorAdapter;
     }
 
-    @Bean (name = "myEntityManagerFactoryBean")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(/*@Qualifier("myDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter*/)  {
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(/*@Qualifier("myDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter*/) {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
         lef.setDataSource(dataSource());
         lef.setJpaVendorAdapter(jpaVendorAdapter());
 
 //        TODO - перепроверить необходимость
-        lef.setPackagesToScan("ru.steklopod.*");
+        lef.setPackagesToScan("ru.steklopod");
 
         Properties properties = new Properties();
-            properties.setProperty("hibernate.show_sql", "true");
-            properties.setProperty("hibernate.format_sql", "true");
-            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
-            properties.setProperty("hibernate.connection.shutdown", "true");
-            properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
-            properties.setProperty("hibernate.proc.param_null_passing", "true");
-            properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
+        properties.setProperty("hibernate.show_sql", "true");
+        properties.setProperty("hibernate.format_sql", "true");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+        properties.setProperty("hibernate.connection.shutdown", "true");
+        properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
+        properties.setProperty("hibernate.proc.param_null_passing", "true");
+        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
 
 //        TODO - перепроверить необходимость
-//            properties.setProperty("hibernate.hbm2ddl.auto", "validate");
+        properties.setProperty("hibernate.hbm2ddl.auto", "update");
         lef.setJpaProperties(properties);
         lef.afterPropertiesSet();
         return lef;
     }
 
-    @Bean(name = "myTransactionManager")
+    @Bean
+//            (name = "myTransactionManager")
     public PlatformTransactionManager transactionManager() {
         return new JpaTransactionManager();
     }
+
+
+
 }

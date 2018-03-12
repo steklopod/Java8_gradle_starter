@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -24,8 +25,6 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @RunWith(JUnitPlatform.class)
 @IncludeTags("production")
 @ExcludeTags("ex")
-
-//@ContextConfiguration(classes = {DataProvider.class})
 class InitJunit5 {
     private static Logger logger = LoggerFactory.getLogger(InitJunit5.class);
 

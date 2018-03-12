@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ContextConfiguration(classes = {DataProvider.class})
-@Disabled
 class OptionalOrElse {
     private static Logger logger = LoggerFactory.getLogger(OptionalOrElse.class);
 
