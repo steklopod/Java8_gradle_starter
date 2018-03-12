@@ -94,8 +94,6 @@ dependencies {
 
 //	testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.0.3'
 
-
-
 	testRuntime group: 'junit', name: 'junit', version: '4.12'
 	testRuntime group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
 

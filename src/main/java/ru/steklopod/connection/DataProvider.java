@@ -68,7 +68,7 @@ public class DataProvider {
         hikariConfig.setMaxLifetime(lifetime);
         hikariConfig.setConnectionTimeout(connectionTimeOut);
         hikariConfig.setIdleTimeout(idleTimeOut);
-//        hikariConfig.setConnectionTestQuery("SELECT 1");
+        hikariConfig.setConnectionTestQuery("SELECT 1");
         hikariConfig.setLeakDetectionThreshold(15000);
 //        hikariConfig.setPoolName("Hikari-test");
         /**
@@ -113,7 +113,7 @@ public class DataProvider {
         return ds;
     }
 
-    @Bean(name = "myJpaVendorAdapt")
+    @Bean(name = "myJpaVendorAdapter")
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
         hibernateJpaVendorAdapter.setShowSql(true);
@@ -122,7 +122,7 @@ public class DataProvider {
         return hibernateJpaVendorAdapter;
     }
 
-    @Bean (name = "myEntityManagerFactorBean")
+    @Bean (name = "myEntityManagerFactoryBean")
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(/*@Qualifier("myDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter*/)  {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
         lef.setDataSource(dataSource());

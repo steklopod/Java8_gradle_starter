@@ -78,6 +78,8 @@ class InitJunit5 {
         Assumptions.assumeFalse("DEV".equals(System.getProperty("ENV")), InitJunit5::message);
         //remainder of test will be aborted
     }
+
+
     @Test
     @DisplayName("Непрерываемый тест")
     void testOnProd() {
