@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Repository
 @Transactional
-public interface Rep extends JpaRepository<TestEntity, Long>{
+public interface RepositoryForTest extends JpaRepository<TestEntity, Long>{
 
     public Optional<TestEntity> findById(@Param("id")Long id );
 }

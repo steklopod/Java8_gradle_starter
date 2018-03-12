@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 class FlatMapExample {
-    private static Logger logger = LoggerFactory.getLogger(FlatMapExample.class);
+    private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 //    Stream<String[]>		-> flatMap ->	Stream<String>
 //    Stream<Set<String>>	-> flatMap ->	Stream<String>
 //    Stream<List<String>>	-> flatMap ->	Stream<String>

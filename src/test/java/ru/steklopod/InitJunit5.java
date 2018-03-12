@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -26,7 +27,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 @IncludeTags("production")
 @ExcludeTags("ex")
 class InitJunit5 {
-    private static Logger logger = LoggerFactory.getLogger(InitJunit5.class);
+    private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     @Value("${spring.datasource.url}")
     private String dataSourceURL;
