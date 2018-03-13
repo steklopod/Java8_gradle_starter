@@ -16,6 +16,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.util.Properties;
 
@@ -26,10 +27,7 @@ import java.util.Properties;
 
 @Configuration
 @EnableAutoConfiguration
-@EnableJpaRepositories(
-        entityManagerFactoryRef = "entityManagerFactory",
-        transactionManagerRef = "transactionManager",
-        basePackages = "ru.stoloto.repositories")
+@EnableJpaRepositories(basePackages = "ru.stoloto.repositories")
 @EnableTransactionManagement
 public class DataProvider {
 
@@ -56,7 +54,6 @@ public class DataProvider {
 
     @Value("${pool.max.lifetime}")
     private int lifetime;
-
 
     @Bean(name = "HikariDS")
     @Primary
@@ -116,7 +113,7 @@ public class DataProvider {
         return ds;
     }
 
-    @Bean("MyBatisJpaVendorAdapter")
+    @Bean
     @Primary
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
@@ -129,7 +126,7 @@ public class DataProvider {
 
     @Bean("entityManagerFactory")
     @Primary
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(/*@Qualifier("myDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter*/) {
+    public EntityManagerFactory entityManagerFactory(/*@Qualifier("myDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter*/) {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
         lef.setDataSource(dataSource());
         lef.setJpaVendorAdapter(jpaVendorAdapter());
@@ -149,13 +146,15 @@ public class DataProvider {
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
         lef.setJpaProperties(properties);
         lef.afterPropertiesSet();
-        return lef;
+        return lef.getObject();
     }
 
     @Bean("transactionManager")
     @Primary
     public PlatformTransactionManager transactionManager() {
-        return new JpaTransactionManager();
+        JpaTransactionManager tm = new JpaTransactionManager();
+        tm.setEntityManagerFactory( entityManagerFactory());
+        return tm;
     }
 
 

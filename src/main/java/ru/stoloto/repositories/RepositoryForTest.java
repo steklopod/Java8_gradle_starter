@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Repository
-@Transactional("MyBatisTransactionManager")
+@Transactional("transactionManager")
 public interface RepositoryForTest extends JpaRepository<TestEntity, Long>{
 
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
