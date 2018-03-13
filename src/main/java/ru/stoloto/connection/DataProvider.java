@@ -3,6 +3,7 @@ package ru.stoloto.connection;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -24,7 +25,11 @@ import java.util.Properties;
  */
 
 @Configuration
-@EnableJpaRepositories(basePackages = "ru.stoloto.repositories")
+@EnableAutoConfiguration
+@EnableJpaRepositories(
+        entityManagerFactoryRef = "entityManagerFactory",
+        transactionManagerRef = "transactionManager",
+        basePackages = "ru.stoloto.repositories")
 @EnableTransactionManagement
 public class DataProvider {
 
@@ -111,7 +116,7 @@ public class DataProvider {
         return ds;
     }
 
-    @Bean
+    @Bean("MyBatisJpaVendorAdapter")
     @Primary
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
@@ -122,7 +127,7 @@ public class DataProvider {
         return hibernateJpaVendorAdapter;
     }
 
-    @Bean
+    @Bean("entityManagerFactory")
     @Primary
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(/*@Qualifier("myDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter*/) {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
@@ -147,11 +152,11 @@ public class DataProvider {
         return lef;
     }
 
-    @Bean
+    @Bean("transactionManager")
+    @Primary
     public PlatformTransactionManager transactionManager() {
         return new JpaTransactionManager();
     }
-
 
 
 }

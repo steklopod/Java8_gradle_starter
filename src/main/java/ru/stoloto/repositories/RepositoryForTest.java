@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Repository
-@Transactional
+@Transactional("MyBatisTransactionManager")
 public interface RepositoryForTest extends JpaRepository<TestEntity, Long>{
 
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
@@ -21,7 +21,5 @@ public interface RepositoryForTest extends JpaRepository<TestEntity, Long>{
     @Async
     @Transactional(readOnly = true)
     CompletableFuture<TestEntity> findOneById(@Param("id")Long id );
-
-
 
 }
