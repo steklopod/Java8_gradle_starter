@@ -16,6 +16,7 @@ import ru.stoloto.repositories.RepositoryForTest;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -48,12 +49,17 @@ class JPATest {
     }
 
 
-
-
     @Test
     void testAbout() {
         String message = this.restTemplate.getForObject("/about", String.class);
         assertEquals("TEST SUCCESFUL", message);
+    }
+
+    @Test
+    void testAsync(){
+        CompletableFuture<TestEntity> oneById = repository.findOneById(1L);
+        TestEntity now = oneById.getNow(null);
+        System.err.println(now);
     }
 
 }
