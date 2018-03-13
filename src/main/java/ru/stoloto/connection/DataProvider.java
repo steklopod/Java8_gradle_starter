@@ -24,7 +24,6 @@ import java.util.Properties;
  */
 
 @Configuration
-//@ComponentScan(basePackages = "ru.stoloto")
 @EnableJpaRepositories(basePackages = "ru.stoloto.repositories")
 @EnableTransactionManagement
 public class DataProvider {
@@ -69,7 +68,7 @@ public class DataProvider {
         hikariConfig.setIdleTimeout(idleTimeOut);
         hikariConfig.setConnectionTestQuery("SELECT 1");
         hikariConfig.setLeakDetectionThreshold(15000);
-//        hikariConfig.setPoolName("Hikari-test");
+        hikariConfig.setPoolName("Hikari-my");
         /**
          * Это свойство определяет, будет ли HikariCP изолировать внутренние запросы пула, такие как тест живой связи,
          * в своей собственной транзакции. Поскольку они обычно являются запросами только для чтения,
@@ -113,7 +112,7 @@ public class DataProvider {
     }
 
     @Bean
-//            (name = "myJpaVendorAdapter")
+    @Primary
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
 //        hibernateJpaVendorAdapter.setShowSql(true);
@@ -124,6 +123,7 @@ public class DataProvider {
     }
 
     @Bean
+    @Primary
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(/*@Qualifier("myDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter*/) {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
         lef.setDataSource(dataSource());
@@ -148,7 +148,6 @@ public class DataProvider {
     }
 
     @Bean
-//            (name = "myTransactionManager")
     public PlatformTransactionManager transactionManager() {
         return new JpaTransactionManager();
     }

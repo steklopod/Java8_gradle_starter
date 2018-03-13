@@ -65,8 +65,10 @@ dependencies {
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 
 //    http://www.querydsl.com
+//    http://www.querydsl.com/static/querydsl/latest/reference/html/ch02.html#jpa_integration
     compile("com.querydsl:querydsl-jpa:${queryDSL}",
             "com.querydsl:querydsl-sql-spring:${queryDSL}",
+            "com.querydsl:querydsl-apt:${queryDSL}",
             "com.querydsl:querydsl-core:${queryDSL}")
 
     runtime('org.springframework.boot:spring-boot-devtools')
