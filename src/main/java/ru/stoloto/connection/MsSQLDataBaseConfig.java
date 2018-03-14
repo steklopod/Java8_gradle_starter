@@ -1,7 +1,6 @@
 package ru.stoloto.connection;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -23,9 +22,8 @@ import javax.sql.DataSource;
         basePackages = "ru.stoloto.repositories.ms")
 @EnableTransactionManagement
 public class MsSQLDataBaseConfig {
-
-    @Value("${another.datasource.hibernate.dialect}")
-    private String dialect;
+//    @Value("${another.datasource.hibernate.dialect}")
+//    private String dialect;
 
     @Autowired
     JpaVendorAdapter jpaVendorAdapter;
@@ -44,7 +42,6 @@ public class MsSQLDataBaseConfig {
 
 //        TODO - изменить при переименовании
         lef.setPackagesToScan("ru.stoloto.entities.mssql");
-
         lef.afterPropertiesSet();
         return lef.getObject();
     }

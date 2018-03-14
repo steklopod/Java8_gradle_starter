@@ -54,7 +54,7 @@ dependencies {
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-data-rest')
 
-//    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-web')
 
 
     compile group: 'name.falgout.jeffrey.testing.junit5', name: 'mockito-extension', version: '1.0.0'
@@ -74,7 +74,7 @@ dependencies {
 //TODO - найти драйвер для MSSQL
 //    compile group: 'com.microsoft.sqlserver', name: 'ms-jdbc', version: '6.5.0.jre9-preview'
 
-//    runtime('org.springframework.boot:spring-boot-devtools')
+    runtime('org.springframework.boot:spring-boot-devtools')
 
     testCompile(
             "org.springframework.boot:spring-boot-starter-test",

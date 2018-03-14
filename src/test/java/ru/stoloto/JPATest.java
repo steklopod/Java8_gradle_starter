@@ -1,5 +1,6 @@
 package ru.stoloto;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -8,71 +9,74 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.stoloto.entities.mssql.MSPerson;
-import ru.stoloto.entities.mybatis.TestEntity;
-import ru.stoloto.repositories.ms.MSSqlRepo;
-import ru.stoloto.repositories.mybatis.RepositoryForTest;
+import ru.stoloto.entities.mssql.User;
+import ru.stoloto.entities.mybatis.UserRebased;
+import ru.stoloto.repositories.ms.MSSqlDAO;
+import ru.stoloto.repositories.mybatis.MyBatisDAO;
 
 import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(JUnitPlatform.class)
-//@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Transactional
 class JPATest {
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+//    @Autowired
+//    private TestRestTemplate restTemplate;
 
     @Autowired
-    private RepositoryForTest repository;
+    private MyBatisDAO myBatisDAO;
 
     @Autowired
-    private MSSqlRepo repositoryMsSql;
+    private MSSqlDAO repositoryMsSql;
 
     @Test
+    @DisplayName("😱 Сохранение в MSsql")
     void saveInMSSQL(){
-        MSPerson person = new MSPerson("Vasiliy Petrov", true);
+        User person = new User("Vasiliy Petrov", true);
         repositoryMsSql.saveAndFlush(person);
     }
 
 
     @Test
-    void getPerson() {
-        String nullName = "Ничего не найдено";
+    @DisplayName("MyBatis GET")
+    void getPersonFromMyBatis() {
+//        String nullName = "Ничего не найдено";
+
         logger.info("Начинаем текстовый поиск...");
-        Optional<TestEntity> person = repository.findById(1L);
+        Optional<UserRebased> person = myBatisDAO.findById(1L);
         person.ifPresent((x) -> System.err.println("Найденное значение - " + x));
     }
 
     @Test
     void savePerson(){
-        TestEntity person = new TestEntity("Peter", true);
-        Object save = repository.saveAndFlush(person);
+        UserRebased person = new UserRebased("Peter", true);
+        Object save = myBatisDAO.saveAndFlush(person);
         System.err.println(save);
     }
 
 
-    @Test
-    void testAbout() {
-        String message = this.restTemplate.getForObject("/about", String.class);
-        assertEquals("TEST SUCCESFUL", message);
-    }
 
     @Test
+    @DisplayName("MyBatis асинхронный GET")
     void testAsync(){
-        CompletableFuture<TestEntity> oneById = repository.findOneById(1L);
-        TestEntity now = oneById.getNow(null);
+        CompletableFuture<UserRebased> oneById = myBatisDAO.findOneById(1L);
+        UserRebased now = oneById.getNow(null);
         System.err.println(now);
     }
+
+
+
+//    @Test
+//    void testAbout() {
+//        String message = this.restTemplate.getForObject("/about", String.class);
+//        assertEquals("TEST SUCCESFUL", message);
+//    }
 
 }

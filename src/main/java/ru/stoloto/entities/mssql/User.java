@@ -7,11 +7,11 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "person_ms")
+@Table(name = "user")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class MSPerson implements Serializable{
+public class User implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -23,7 +23,7 @@ public class MSPerson implements Serializable{
     @Column
     private boolean isMan;
 
-    public MSPerson(String name, boolean isMan) {
+    public User(String name, boolean isMan) {
         this.name = name;
         this.isMan = isMan;
     }

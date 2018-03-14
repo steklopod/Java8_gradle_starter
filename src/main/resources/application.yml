@@ -11,9 +11,9 @@ mybatis:
     timeBetweenEvictionRunsMillis: 60000
     minEvictableIdleTimeMillis: 30000
     validationQuery: SELECT 1
-    max-active: 15
-    max-idle: 10
-    max-wait: 8000
+    max-active: 4
+    max-idle: 3
+    max-wait: 10000
     hibernate.dialect: "org.hibernate.dialect.MySQL5Dialect"
 
 another:
@@ -28,9 +28,9 @@ another:
     timeBetweenEvictionRunsMillis: 60000
     minEvictableIdleTimeMillis: 30000
     validationQuery: SELECT 1
-    max-active: 15
-    max-idle: 10
-    max-wait: 8000
+    max-active: 4
+    max-idle: 3
+    max-wait: 10000
     hibernate.dialect: "org.hibernate.dialect.MySQL5Dialect"
 server:
   port: 8080
@@ -45,11 +45,22 @@ pool:
   max.lifetime: 180000
 
 spring:
+  datasource:
+    hikari:
+      allow-pool-suspension: true
+      connection-init-sql:  "SELECt 1"
+      connection-timeout: 60000
+      idle-timeout: 120000
+      isolate-internal-queries: true
+      minimum-idle: 1
+      maximum-pool-size: 4
+      max-lifetime: 180000
+
   jpa:
     database: default
     generate-ddl: true
     hibernate:
-      ddl-auto:  update
+      ddl-auto:  create
       use-new-id-generator-mappings: true
 
 

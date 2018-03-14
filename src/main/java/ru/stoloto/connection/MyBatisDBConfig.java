@@ -137,7 +137,7 @@ public class MyBatisDBConfig {
         properties.setProperty("hibernate.connection.shutdown", "true");
         properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
         properties.setProperty("hibernate.proc.param_null_passing", "true");
-//        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
+        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
 
 //        TODO - изменить на validate в продакшн
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
