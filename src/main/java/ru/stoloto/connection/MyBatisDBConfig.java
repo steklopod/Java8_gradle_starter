@@ -5,7 +5,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
@@ -26,7 +25,10 @@ import java.util.Properties;
 
 @Configuration
 //@EnableAutoConfiguration
-@EnableJpaRepositories(basePackages = "ru.stoloto.repositories.mybatis")
+@EnableJpaRepositories(
+        entityManagerFactoryRef = "entityManagerFactory",
+        transactionManagerRef = "transactionManager",
+        basePackages = "ru.stoloto.repositories.mybatis")
 @EnableTransactionManagement
 public class MyBatisDBConfig {
 
@@ -55,7 +57,7 @@ public class MyBatisDBConfig {
     private int lifetime;
 
     @Bean
-    @Primary
+//    @Primary
     public DataSource dataSource() {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setDriverClassName(driverClassName);
@@ -113,7 +115,7 @@ public class MyBatisDBConfig {
     }
 
     @Bean
-    @Primary
+//    @Primary
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
         hibernateJpaVendorAdapter.setShowSql(false);
@@ -123,7 +125,7 @@ public class MyBatisDBConfig {
     }
 
     @Bean
-    @Primary
+//    @Primary
     public EntityManagerFactory entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
         lef.setDataSource(dataSource());
@@ -149,7 +151,7 @@ public class MyBatisDBConfig {
     }
 
     @Bean("transactionManager")
-    @Primary
+//    @Primary
     public PlatformTransactionManager transactionManager() {
         JpaTransactionManager tm = new JpaTransactionManager();
         tm.setEntityManagerFactory(entityManagerFactory());
