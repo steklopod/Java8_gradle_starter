@@ -3,7 +3,6 @@ package ru.stoloto.connection;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -26,21 +25,21 @@ import java.util.Properties;
  */
 
 @Configuration
-@EnableAutoConfiguration
-@EnableJpaRepositories(basePackages = "ru.stoloto.repositories")
+//@EnableAutoConfiguration
+@EnableJpaRepositories(basePackages = "ru.stoloto.repositories.mybatis")
 @EnableTransactionManagement
 public class DataProvider {
 
-    @Value("${spring.datasource.username}")
+    @Value("${mybatis.datasource.username}")
     private String username;
 
-    @Value("${spring.datasource.password}")
+    @Value("${mybatis.datasource.password}")
     private String password;
 
-    @Value("${spring.datasource.url}")
+    @Value("${mybatis.datasource.url}")
     private String url;
 
-    @Value("${spring.datasource.driver-class-name}")
+    @Value("${mybatis.datasource.driver-class-name}")
     private String driverClassName;
 
     @Value("${pool.size}")
@@ -55,7 +54,7 @@ public class DataProvider {
     @Value("${pool.max.lifetime}")
     private int lifetime;
 
-    @Bean(name = "HikariDS")
+    @Bean
     @Primary
     public DataSource dataSource() {
         HikariConfig hikariConfig = new HikariConfig();
@@ -117,22 +116,21 @@ public class DataProvider {
     @Primary
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
-//        hibernateJpaVendorAdapter.setShowSql(true);
         hibernateJpaVendorAdapter.setShowSql(false);
         hibernateJpaVendorAdapter.setGenerateDdl(true);
         hibernateJpaVendorAdapter.setDatabase(Database.MYSQL);
         return hibernateJpaVendorAdapter;
     }
 
-    @Bean("entityManagerFactory")
+    @Bean
     @Primary
-    public EntityManagerFactory entityManagerFactory(/*@Qualifier("myDataSource") DataSource dataSource, JpaVendorAdapter jpaVendorAdapter*/) {
+    public EntityManagerFactory entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
         lef.setDataSource(dataSource());
         lef.setJpaVendorAdapter(jpaVendorAdapter());
 
 //        TODO - изменить при переименовании
-        lef.setPackagesToScan("ru.stoloto");
+        lef.setPackagesToScan("ru.stoloto.entities");
         Properties properties = new Properties();
         properties.setProperty("hibernate.show_sql", "true");
         properties.setProperty("hibernate.format_sql", "true");
@@ -153,7 +151,7 @@ public class DataProvider {
     @Primary
     public PlatformTransactionManager transactionManager() {
         JpaTransactionManager tm = new JpaTransactionManager();
-        tm.setEntityManagerFactory( entityManagerFactory());
+        tm.setEntityManagerFactory(entityManagerFactory());
         return tm;
     }
 

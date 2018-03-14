@@ -11,7 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.stoloto.entities.TestEntity;
-import ru.stoloto.repositories.RepositoryForTest;
+import ru.stoloto.repositories.mybatis.RepositoryForTest;
 
 import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
