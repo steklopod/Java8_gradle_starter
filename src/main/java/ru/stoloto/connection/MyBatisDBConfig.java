@@ -24,7 +24,6 @@ import java.util.Properties;
  */
 
 @Configuration
-//@EnableAutoConfiguration
 @EnableJpaRepositories(
         entityManagerFactoryRef = "entityManagerFactory",
         transactionManagerRef = "transactionManager",
@@ -57,7 +56,6 @@ public class MyBatisDBConfig {
     private int lifetime;
 
     @Bean
-//    @Primary
     public DataSource dataSource() {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setDriverClassName(driverClassName);
@@ -115,7 +113,6 @@ public class MyBatisDBConfig {
     }
 
     @Bean
-//    @Primary
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
         hibernateJpaVendorAdapter.setShowSql(false);
@@ -125,7 +122,6 @@ public class MyBatisDBConfig {
     }
 
     @Bean
-//    @Primary
     public EntityManagerFactory entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
         lef.setDataSource(dataSource());
@@ -137,7 +133,7 @@ public class MyBatisDBConfig {
         Properties properties = new Properties();
 //        properties.setProperty("hibernate.show_sql", "true");
 //        properties.setProperty("hibernate.format_sql", "true");
-//        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
 //        properties.setProperty("hibernate.connection.shutdown", "true");
 //        properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
 //        properties.setProperty("hibernate.proc.param_null_passing", "true");
@@ -151,7 +147,6 @@ public class MyBatisDBConfig {
     }
 
     @Bean("transactionManager")
-//    @Primary
     public PlatformTransactionManager transactionManager() {
         JpaTransactionManager tm = new JpaTransactionManager();
         tm.setEntityManagerFactory(entityManagerFactory());

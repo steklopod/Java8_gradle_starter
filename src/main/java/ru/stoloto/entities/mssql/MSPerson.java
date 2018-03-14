@@ -23,10 +23,6 @@ public class MSPerson implements Serializable{
     @Column
     private boolean isMan;
 
-    public MSPerson(String name) {
-        this.name = name;
-    }
-
     public MSPerson(String name, boolean isMan) {
         this.name = name;
         this.isMan = isMan;

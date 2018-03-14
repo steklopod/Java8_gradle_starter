@@ -20,11 +20,11 @@ import java.util.Properties;
 
 @Configuration
 @EnableJpaRepositories(
-        entityManagerFactoryRef = "aentityManagerFactory",
-        transactionManagerRef = "atransactionManager",
+        entityManagerFactoryRef = "msSQLEntityFactory",
+        transactionManagerRef = "MsSqlTtransactionManager",
         basePackages = "ru.stoloto.repositories.ms")
 @EnableTransactionManagement
-public class MsSQLDataSource {
+public class MsSQLDataBaseConfig {
 
     @Value("${another.datasource.url}")
     private String url;
@@ -42,7 +42,6 @@ public class MsSQLDataSource {
     private String dialect;
 
     @Bean
-//            ("MS_datasource")
     public DataSource adataSource() {
         HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setDriverClassName(driverClassName);
@@ -69,18 +68,18 @@ public class MsSQLDataSource {
     }
 
     @Bean
-//            (name = "MS_jpaVendorAdapter")
     public JpaVendorAdapter jpaVendorAdapter() {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
         hibernateJpaVendorAdapter.setShowSql(false);
         hibernateJpaVendorAdapter.setGenerateDdl(true);
+
+//        TODO - изменить при переименовании
         hibernateJpaVendorAdapter.setDatabase(Database.MYSQL);
         return hibernateJpaVendorAdapter;
     }
 
     @Bean
-//            (name = "MS_entityManagerFactory")
-    public EntityManagerFactory aentityManagerFactory() {
+    public EntityManagerFactory msSQLEntityFactory() {
         LocalContainerEntityManagerFactoryBean lef = new LocalContainerEntityManagerFactoryBean();
         lef.setDataSource(adataSource());
         lef.setJpaVendorAdapter(jpaVendorAdapter());
@@ -105,10 +104,9 @@ public class MsSQLDataSource {
     }
 
     @Bean
-//            (name = "MS_transactionManager")
-    public PlatformTransactionManager atransactionManager() {
+    public PlatformTransactionManager MsSqlTtransactionManager() {
         JpaTransactionManager tm = new JpaTransactionManager();
-        tm.setEntityManagerFactory(aentityManagerFactory());
+        tm.setEntityManagerFactory(msSQLEntityFactory());
         return tm;
     }
 

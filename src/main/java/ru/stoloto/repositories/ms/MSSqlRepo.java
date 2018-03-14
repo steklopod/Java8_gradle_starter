@@ -6,7 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mssql.MSPerson;
 
 @Repository
-@Transactional("atransactionManager")
+@Transactional("MsSqlTtransactionManager")
 public interface MSSqlRepo extends JpaRepository<MSPerson, Long>{
 
 //    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)

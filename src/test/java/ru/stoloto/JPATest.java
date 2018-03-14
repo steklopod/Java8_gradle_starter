@@ -10,7 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import ru.stoloto.entities.mssql.MSPerson;
 import ru.stoloto.entities.mybatis.TestEntity;
+import ru.stoloto.repositories.ms.MSSqlRepo;
 import ru.stoloto.repositories.mybatis.RepositoryForTest;
 
 import javax.transaction.Transactional;
@@ -33,6 +35,17 @@ class JPATest {
 
     @Autowired
     private RepositoryForTest repository;
+
+    @Autowired
+    private MSSqlRepo repositoryMsSql;
+
+    @Test
+    void saveInMSSQL(){
+        MSPerson person = new MSPerson("Vasiliy Petrov", true);
+        repositoryMsSql.saveAndFlush(person);
+    }
+
+
 
     @Test
     void getPerson() {
