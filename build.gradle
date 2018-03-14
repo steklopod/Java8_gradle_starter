@@ -46,10 +46,6 @@ repositories {
     maven { url "https://repo.spring.io/milestone" }
 }
 
-//configurations {
-//	providedRuntime
-//}
-
 dependencies {
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
@@ -75,7 +71,7 @@ dependencies {
 //            "com.querydsl:querydsl-apt:${queryDSL}",
 //            "com.querydsl:querydsl-core:${queryDSL}")
 
-
+//TODO - найти драйвер для MSSQL
 //    compile group: 'com.microsoft.sqlserver', name: 'ms-jdbc', version: '6.5.0.jre9-preview'
 
 //    runtime('org.springframework.boot:spring-boot-devtools')
@@ -91,9 +87,9 @@ dependencies {
     )
 
     testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.0.3'
-
     testRuntime group: 'junit', name: 'junit', version: '4.12'
     testRuntime group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
+
 
 //	compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '2.0.0.RELEASE'
 //	compile('org.springframework.boot:spring-boot-starter-security')

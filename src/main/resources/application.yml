@@ -1,0 +1,48 @@
+#spring:
+#  datasource.type: com.zaxxer.hikari.HikariDataSource
+#  application:
+#    name: database-app
+mybatis:
+  datasource:
+    driverClassName: org.mariadb.jdbc.Driver
+    url: "jdbc:mysql://127.0.0.1:3306/test"
+    jdbc-url: "jdbc:mysql://127.0.0.1:3306/test"
+    password: "root"
+    username: "root"
+    testOnBorrow: true
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: SELECT 1
+    max-active: 15
+    max-idle: 10
+    max-wait: 8000
+    hibernate.dialect: "org.hibernate.dialect.MySQL5Dialect"
+
+another:
+  datasource:
+    driverClassName: org.mariadb.jdbc.Driver
+    url: "jdbc:mysql://127.0.0.2:3306/another"
+    jdbc-url: "jdbc:mysql://127.0.0.2:3306/another"
+    password: "root"
+    username: "root"
+    testOnBorrow: true
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: SELECT 1
+    max-active: 15
+    max-idle: 10
+    max-wait: 8000
+    hibernate.dialect: "org.hibernate.dialect.MySQL5Dialect"
+server:
+  port: 8080
+
+pool:
+  connection.timeout: 10000
+  idle.timeout: 60000
+  size: 4
+    # Это свойство управляет максимальным временем жизни соединения в пуле. Когда соединение достигнет
+    # этого тайм-аута, даже если он используется недавно, он будет удален из пула. Входящее в действие
+    # соединение никогда не будет удалено, только когда он простаивает, он будет удален.
+  max.lifetime: 180000

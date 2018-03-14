@@ -24,10 +24,6 @@ public class TestEntity implements Serializable{
     @Column
     private boolean isMan;
 
-    public TestEntity(String name) {
-        this.name = name;
-    }
-
     public TestEntity(String name, boolean isMan) {
         this.name = name;
         this.isMan = isMan;
