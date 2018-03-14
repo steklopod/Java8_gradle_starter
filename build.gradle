@@ -61,21 +61,21 @@ dependencies {
     compile group: 'name.falgout.jeffrey.testing.junit5', name: 'mockito-extension', version: '1.0.0'
 
     compile("org.projectlombok:lombok:${lombokVersion}")
-    compile('org.springframework.boot:spring-boot-starter-actuator')
+//    compile('org.springframework.boot:spring-boot-starter-actuator')
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
 
 //    http://www.querydsl.com
 //    http://www.querydsl.com/static/querydsl/latest/reference/html/ch02.html#jpa_integration
-    compile("com.querydsl:querydsl-jpa:${queryDSL}",
-            "com.querydsl:querydsl-sql-spring:${queryDSL}",
-            "com.querydsl:querydsl-apt:${queryDSL}",
-            "com.querydsl:querydsl-core:${queryDSL}")
+//    compile("com.querydsl:querydsl-jpa:${queryDSL}",
+//            "com.querydsl:querydsl-sql-spring:${queryDSL}",
+//            "com.querydsl:querydsl-apt:${queryDSL}",
+//            "com.querydsl:querydsl-core:${queryDSL}")
 
 
     compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.0.jre9-preview'
 
-    runtime('org.springframework.boot:spring-boot-devtools')
+//    runtime('org.springframework.boot:spring-boot-devtools')
 
     testCompile(
             "org.springframework.boot:spring-boot-starter-test",

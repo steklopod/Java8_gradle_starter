@@ -28,7 +28,7 @@ import java.util.Properties;
 //@EnableAutoConfiguration
 @EnableJpaRepositories(basePackages = "ru.stoloto.repositories.mybatis")
 @EnableTransactionManagement
-public class DataProvider {
+public class MyBatisDBConfig {
 
     @Value("${mybatis.datasource.username}")
     private String username;

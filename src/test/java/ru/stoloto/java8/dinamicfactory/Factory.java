@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.stoloto.connection.DataProvider;
+import ru.stoloto.connection.MyBatisDBConfig;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
-@ContextConfiguration(classes = {DataProvider.class})
+@ContextConfiguration(classes = {MyBatisDBConfig.class})
 class Factory {
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

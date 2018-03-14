@@ -1,7 +1,6 @@
 package ru.stoloto.java8;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -11,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.stoloto.connection.DataProvider;
+import ru.stoloto.connection.MyBatisDBConfig;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
-@ContextConfiguration(classes = {DataProvider.class})
+@ContextConfiguration(classes = {MyBatisDBConfig.class})
 class OptionalOrElse {
     private static Logger logger = LoggerFactory.getLogger(OptionalOrElse.class);
 
