@@ -48,7 +48,6 @@ class JPATest {
     @DisplayName("MyBatis GET")
     void getPersonFromMyBatis() {
 //        String nullName = "Ничего не найдено";
-
         logger.info("Начинаем текстовый поиск...");
         Optional<UserRebased> person = myBatisDAO.findById(1L);
         person.ifPresent((x) -> System.err.println("Найденное значение - " + x));
@@ -56,7 +55,7 @@ class JPATest {
 
     @Test
     void savePerson(){
-        UserRebased person = new UserRebased("Peter", true);
+        UserRebased person = new UserRebased("Peter", "Djesyude7Ydbdcjd**ed4");
         Object save = myBatisDAO.saveAndFlush(person);
         System.err.println(save);
     }

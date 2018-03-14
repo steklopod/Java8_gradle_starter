@@ -13,19 +13,21 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 public class UserRebased implements Serializable{
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
     private Long id;
 
-    @Column
-    private String name;
+    @Version
+    protected int version = 1;
 
-    @Column
-    private boolean isMan;
+    private String email;
+    private String phone;
+    private String password;
 
-    public UserRebased(String name, boolean isMan) {
-        this.name = name;
-        this.isMan = isMan;
+
+    public UserRebased(String phone, String password) {
+        this.phone = phone;
+        this.password = password;
     }
 }

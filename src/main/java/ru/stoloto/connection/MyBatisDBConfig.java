@@ -140,7 +140,7 @@ public class MyBatisDBConfig {
         properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
 
 //        TODO - изменить на validate в продакшн
-        properties.setProperty("hibernate.hbm2ddl.auto", "update");
+        properties.setProperty("hibernate.hbm2ddl.auto", "create");
         lef.setJpaProperties(properties);
         lef.afterPropertiesSet();
         return lef.getObject();
