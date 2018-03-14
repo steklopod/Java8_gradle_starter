@@ -76,7 +76,7 @@ dependencies {
 //            "com.querydsl:querydsl-core:${queryDSL}")
 
 
-    compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.0.jre9-preview'
+//    compile group: 'com.microsoft.sqlserver', name: 'ms-jdbc', version: '6.5.0.jre9-preview'
 
 //    runtime('org.springframework.boot:spring-boot-devtools')
 

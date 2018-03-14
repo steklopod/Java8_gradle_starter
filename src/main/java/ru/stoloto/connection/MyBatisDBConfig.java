@@ -133,13 +133,13 @@ public class MyBatisDBConfig {
         lef.setPackagesToScan("ru.stoloto.entities.mybatis");
 
         Properties properties = new Properties();
-        properties.setProperty("hibernate.show_sql", "true");
-        properties.setProperty("hibernate.format_sql", "true");
-        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
-        properties.setProperty("hibernate.connection.shutdown", "true");
-        properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
-        properties.setProperty("hibernate.proc.param_null_passing", "true");
-        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
+//        properties.setProperty("hibernate.show_sql", "true");
+//        properties.setProperty("hibernate.format_sql", "true");
+//        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
+//        properties.setProperty("hibernate.connection.shutdown", "true");
+//        properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
+//        properties.setProperty("hibernate.proc.param_null_passing", "true");
+//        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
 
 //        TODO - изменить на validate в продакшн
         properties.setProperty("hibernate.hbm2ddl.auto", "update");

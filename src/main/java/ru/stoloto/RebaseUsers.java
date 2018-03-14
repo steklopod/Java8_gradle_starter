@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 //		(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class,
 //		DataSourceTransactionManagerAutoConfiguration.class })
-@EnableJpaRepositories
+@EnableJpaRepositories(basePackages = "ru.stoloto.repositories.mybatis")
 @EnableTransactionManagement
 public class RebaseUsers {
 	public static void main(String[] args) {
