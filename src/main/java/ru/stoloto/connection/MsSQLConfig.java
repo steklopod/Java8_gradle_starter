@@ -21,7 +21,7 @@ import javax.sql.DataSource;
         transactionManagerRef = "MsSqlTtransactionManager",
         basePackages = "ru.stoloto.repositories.ms")
 @EnableTransactionManagement
-public class MsSQLDataBaseConfig {
+public class MsSQLConfig {
 //    @Value("${another.datasource.hibernate.dialect}")
 //    private String dialect;
 

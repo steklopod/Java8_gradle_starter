@@ -18,7 +18,6 @@ plugins {
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'maven'
 apply plugin: 'org.springframework.boot'
@@ -53,13 +52,11 @@ dependencies {
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.7.8'
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-data-rest')
-
-    compile('org.springframework.boot:spring-boot-starter-web')
-
     compile group: 'name.falgout.jeffrey.testing.junit5', name: 'mockito-extension', version: '1.0.0'
     compile("org.projectlombok:lombok:${lombokVersion}")
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
+    compile('org.springframework.boot:spring-boot-starter-web')
 
 //    http://www.querydsl.com
 //    http://www.querydsl.com/static/querydsl/latest/reference/html/ch02.html#jpa_integration
@@ -87,14 +84,13 @@ dependencies {
     testRuntime group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
 
 
-//	compile group: 'org.springframework.boot', name: 'spring-boot-starter-tomcat', version: '2.0.0.RELEASE'
 //	compile('org.springframework.boot:spring-boot-starter-security')
 //	compile('org.springframework.boot:spring-boot-starter-cache')
 //	compile('org.springframework.session:spring-session-core')
 //	compile('org.springframework.boot:spring-boot-starter-webflux')
-//	providedRuntime('org.springframework.boot:spring-boot-starter-tomcat')
+//  compile('org.springframework.boot:spring-boot-starter-actuator')
+
 //	testCompile('io.projectreactor:reactor-test')
 //	testCompile('org.springframework.security:spring-security-test')
-//    compile('org.springframework.boot:spring-boot-starter-actuator')
 
 }

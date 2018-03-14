@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.stoloto.entities.mssql.User;
+import ru.stoloto.entities.mssql.Client;
 import ru.stoloto.entities.mybatis.UserRebased;
 import ru.stoloto.repositories.ms.MSSqlDAO;
 import ru.stoloto.repositories.mybatis.MyBatisDAO;
@@ -39,7 +39,7 @@ class JPATest {
     @Test
     @DisplayName("😱 Сохранение в MSsql")
     void saveInMSSQL(){
-        User person = new User("Vasiliy Petrov", true);
+        Client person = new Client("Vasiliy Petrov", true);
         repositoryMsSql.saveAndFlush(person);
     }
 
@@ -59,7 +59,6 @@ class JPATest {
         Object save = myBatisDAO.saveAndFlush(person);
         System.err.println(save);
     }
-
 
 
     @Test
