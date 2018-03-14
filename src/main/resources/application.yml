@@ -1,7 +1,4 @@
-#spring:
-#  datasource.type: com.zaxxer.hikari.HikariDataSource
-#  application:
-#    name: database-app
+
 mybatis:
   datasource:
     driverClassName: org.mariadb.jdbc.Driver
@@ -46,3 +43,18 @@ pool:
     # этого тайм-аута, даже если он используется недавно, он будет удален из пула. Входящее в действие
     # соединение никогда не будет удалено, только когда он простаивает, он будет удален.
   max.lifetime: 180000
+
+spring:
+  jpa:
+    database: default
+    generate-ddl: true
+    hibernate:
+      ddl-auto:  update
+      use-new-id-generator-mappings: true
+
+
+#  datasource.type: com.zaxxer.hikari.HikariDataSource
+#  application:
+#    name: database-app
+#  jackson:
+#    serialization: true

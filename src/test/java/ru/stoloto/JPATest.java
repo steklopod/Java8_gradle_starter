@@ -46,7 +46,6 @@ class JPATest {
     }
 
 
-
     @Test
     void getPerson() {
         String nullName = "Ничего не найдено";
