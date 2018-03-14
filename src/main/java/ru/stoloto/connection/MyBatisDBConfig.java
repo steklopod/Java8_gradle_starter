@@ -130,7 +130,8 @@ public class MyBatisDBConfig {
         lef.setJpaVendorAdapter(jpaVendorAdapter());
 
 //        TODO - изменить при переименовании
-        lef.setPackagesToScan("ru.stoloto.entities");
+        lef.setPackagesToScan("ru.stoloto.entities.mybatis");
+
         Properties properties = new Properties();
         properties.setProperty("hibernate.show_sql", "true");
         properties.setProperty("hibernate.format_sql", "true");

@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
@@ -13,7 +12,6 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
@@ -21,24 +19,23 @@ import javax.sql.DataSource;
 @EnableJpaRepositories(
         entityManagerFactoryRef = "MS_entityManagerFactory",
         transactionManagerRef = "MS_transactionManager",
-        basePackages = {"ru.stoloto.repositories"})
+        basePackages = {"ru.stoloto.repositories.mssql"})
 @EnableTransactionManagement
-//@PropertySource({ "classpath:mybatis.properties" })
 public class MsSQLDataSource {
 
-    @Value("${ms.datasource.url}")
+    @Value("${another.datasource.url}")
     private String databaseUrl;
 
-    @Value("${ms.datasource.username}")
+    @Value("${another.datasource.username}")
     private String username;
 
-    @Value("${ms.datasource.password}")
+    @Value("${another.datasource.password}")
     private String password;
 
-    @Value("${ms.dataource.driverClassName}")
+    @Value("${another.dataource.driverClassName}")
     private String driverClassName;
 
-    @Value("${ms.datasource.hibernate.dialect}")
+    @Value("${another.datasource.hibernate.dialect}")
     private String dialect;
 
     @Autowired
@@ -51,19 +48,18 @@ public class MsSQLDataSource {
         return dataSource;
     }
 
-    @Bean(name = "MS_entityManager")
-    public EntityManager entityManager() {
-        return entityManagerFactory().createEntityManager();
-    }
+//    @Bean(name = "MS_entityManager")
+//    public EntityManager entityManager() {
+//        return entityManagerFactory().createEntityManager();
+//    }
 
-    @Primary
     @Bean(name = "MS_entityManagerFactory")
     public EntityManagerFactory entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean emf = new LocalContainerEntityManagerFactoryBean();
         emf.setDataSource(dataSource());
         emf.setJpaVendorAdapter(jpaVendorAdapter);
-        emf.setPackagesToScan("ru.stoloto.repositories");
-        emf.setPersistenceUnitName("default");   // <- giving 'default' as name
+        emf.setPackagesToScan("ru.stoloto.entities.mssql");
+//        emf.setPersistenceUnitName("default");   // <- giving 'default' as name
         emf.afterPropertiesSet();
         return emf.getObject();
     }
