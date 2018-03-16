@@ -1,11 +1,11 @@
 
 mariadb:
   datasource:
-    driverClassName: org.mariadb.jdbc.Driver
-    url: "jdbc:mysql://127.0.0.1:3306/test"
-    jdbc-url: "jdbc:mysql://127.0.0.1:3306/test"
-    password: root
-    username: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://127.0.0.2:3306/PROFILESERVICE?autoReconnect=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    jdbc-url: "jdbc:mysql://127.0.0.2:3306/PROFILESERVICE?autoReconnect=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    password: "root"
+    username: "root"
     testOnBorrow: true
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 60000
@@ -18,25 +18,11 @@ mariadb:
 
 sql-server:
   datasource:
-#      driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#      url: "jdbc:sqlserver://10.60.170.11:1433;database=StolotoSB"
-#      jdbc-url: "jdbc:sqlserver://10.60.170.11:1433;database=StolotoSB"
-#      username: "stoloto_ro"
-#      password: "3Dq3--uVQtM-d-xS"
-#      testOnBorrow: true
-#      testWhileIdle: true
-#      timeBetweenEvictionRunsMillis: 60000
-#      minEvictableIdleTimeMillis: 30000
-#      validationQuery: SELECT 1
-#      max-active: 4
-#      max-idle: 3
-#      max-wait: 10000
-#      hibernate.dialect: "org.hibernate.dialect.SQLServer2012Dialect"
-    driverClassName: org.mariadb.jdbc.Driver
-    url: "jdbc:mysql://127.0.0.2:3306/another"
-    jdbc-url: "jdbc:mysql://127.0.0.2:3306/another"
-    password: root
-    username: root
+    driverClassName: com.mysql.cj.jdbc.Driver
+    url: "jdbc:mysql://127.0.0.3:3306/TASKSERVICE?autoReconnect=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    jdbc-url: "jdbc:mysql://127.0.0.3:3306/TASKSERVICE?autoReconnect=true&useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC"
+    password: "root"
+    username: "root"
     testOnBorrow: true
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 60000
@@ -50,7 +36,7 @@ sql-server:
       dialect: org.hibernate.dialect.MySQL5Dialect
 
 server:
-  port: 8080
+  port: 8088
 
 pool:
   connection.timeout: 10000
@@ -79,6 +65,7 @@ spring:
     hibernate:
       ddl-auto:  create
       use-new-id-generator-mappings: true
+
 
 
 #  datasource.type: com.zaxxer.hikari.HikariDataSource

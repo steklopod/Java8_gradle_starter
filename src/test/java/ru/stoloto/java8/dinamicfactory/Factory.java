@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import ru.stoloto.connection.MyBatisDBConfig;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
