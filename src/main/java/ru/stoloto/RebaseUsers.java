@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 //		(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class })
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = {"ru.ru.stoloto.repositories.maria"})
+@EnableJpaRepositories(basePackages = {"ru.stoloto.repositories.maria"})
 @EnableTransactionManagement
 public class RebaseUsers {
 	public static void main(String[] args) {

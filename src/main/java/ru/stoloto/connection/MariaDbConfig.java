@@ -30,7 +30,7 @@ import java.util.Properties;
 @EnableJpaRepositories(
         entityManagerFactoryRef = "entityManagerFactory",
         transactionManagerRef = "transactionManager",
-        basePackages = "ru.ru.stoloto.repositories.maria")
+        basePackages = "ru.stoloto.repositories.maria")
 @EnableTransactionManagement
 public class MariaDbConfig {
 
@@ -134,7 +134,7 @@ public class MariaDbConfig {
         lef.setJpaVendorAdapter(jpaVendorAdapter());
 
 //        TODO - изменить при переименовании
-        lef.setPackagesToScan("ru.ru.stoloto.entities.mariadb");
+        lef.setPackagesToScan("ru.stoloto.entities.mariadb");
 
         Properties properties = new Properties();
 //        properties.setProperty("hibernate.show_sql", "true");

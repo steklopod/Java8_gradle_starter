@@ -23,7 +23,7 @@ import java.util.Properties;
 @EnableJpaRepositories(
         entityManagerFactoryRef = "msSQLEntityFactory",
         transactionManagerRef = "MsSqlTtransactionManager",
-        basePackages = "ru.ru.stoloto.repositories.ms")
+        basePackages = "ru.stoloto.repositories.ms")
 @EnableTransactionManagement
 public class MsSQLConfig {
 
@@ -46,7 +46,7 @@ public class MsSQLConfig {
         lef.setJpaVendorAdapter(jpaVendorAdapter);
 
 //        TODO - изменить при переименовании
-        lef.setPackagesToScan("ru.ru.stoloto.entities.mssql");
+        lef.setPackagesToScan("ru.stoloto.entities.mssql");
 
         Properties properties = new Properties();
         properties.setProperty("hibernate.format_sql", "true");
