@@ -9,7 +9,6 @@ import org.junit.platform.suite.api.IncludeTags;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -17,7 +16,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
@@ -28,8 +26,8 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 class InitJunit5 {
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    @Value("${spring.datasource.url}")
-    private String dataSourceURL;
+//    @Value("${spring.datasource.url}")
+//    private String dataSourceURL;
 
     @BeforeAll
     static void initializeExternalResources() {
@@ -41,14 +39,14 @@ class InitJunit5 {
         System.out.println("Перед каждым...");
     }
 
-    @Test
-    @DisplayName("Проверка application.properties")
-    @Tag("production")
-    void checkAppPropertiesFile() {
-        assertNotNull(dataSourceURL);
-        System.out.println(" >>> OK <<< Файл application.properties доступен.");
-        System.err.println("Адрес БД: " + dataSourceURL);
-    }
+//    @Test
+//    @DisplayName("Проверка application.properties")
+//    @Tag("production")
+//    void checkAppPropertiesFile() {
+//        assertNotNull(dataSourceURL);
+//        System.out.println(" >>> OK <<< Файл application.properties доступен.");
+//        System.err.println("Адрес БД: " + dataSourceURL);
+//    }
 
     @DisplayName("😱 Повторяемый тест")
     @RepeatedTest(4)

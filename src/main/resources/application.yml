@@ -1,11 +1,11 @@
 
-mybatis:
+mariadb:
   datasource:
     driverClassName: org.mariadb.jdbc.Driver
     url: "jdbc:mysql://127.0.0.1:3306/test"
     jdbc-url: "jdbc:mysql://127.0.0.1:3306/test"
-    password: "root"
-    username: "root"
+    password: root
+    username: root
     testOnBorrow: true
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 60000
@@ -14,15 +14,29 @@ mybatis:
     max-active: 4
     max-idle: 3
     max-wait: 10000
-    hibernate.dialect: "org.hibernate.dialect.MySQL5Dialect"
+    hibernate.dialect: org.hibernate.dialect.MySQL5Dialect
 
-another:
+sql-server:
   datasource:
+#      driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
+#      url: "jdbc:sqlserver://10.60.170.11:1433;database=StolotoSB"
+#      jdbc-url: "jdbc:sqlserver://10.60.170.11:1433;database=StolotoSB"
+#      username: "stoloto_ro"
+#      password: "3Dq3--uVQtM-d-xS"
+#      testOnBorrow: true
+#      testWhileIdle: true
+#      timeBetweenEvictionRunsMillis: 60000
+#      minEvictableIdleTimeMillis: 30000
+#      validationQuery: SELECT 1
+#      max-active: 4
+#      max-idle: 3
+#      max-wait: 10000
+#      hibernate.dialect: "org.hibernate.dialect.SQLServer2012Dialect"
     driverClassName: org.mariadb.jdbc.Driver
     url: "jdbc:mysql://127.0.0.2:3306/another"
     jdbc-url: "jdbc:mysql://127.0.0.2:3306/another"
-    password: "root"
-    username: "root"
+    password: root
+    username: root
     testOnBorrow: true
     testWhileIdle: true
     timeBetweenEvictionRunsMillis: 60000
@@ -31,7 +45,10 @@ another:
     max-active: 4
     max-idle: 3
     max-wait: 10000
-    hibernate.dialect: "org.hibernate.dialect.MySQL5Dialect"
+    hibernate:
+      ddl-auto: create
+      dialect: org.hibernate.dialect.MySQL5Dialect
+
 server:
   port: 8080
 

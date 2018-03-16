@@ -46,27 +46,36 @@ repositories {
 }
 
 dependencies {
+//    compile project(':site-model')
+
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
     compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.2.3'
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.7.8'
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-data-rest')
-    compile group: 'name.falgout.jeffrey.testing.junit5', name: 'mockito-extension', version: '1.0.0'
-    compile("org.projectlombok:lombok:${lombokVersion}")
+//    compile group: 'name.falgout.jeffrey.testing.junit5', name: 'mockito-extension', version: '1.0.0'
+//    compile("org.projectlombok:lombok:${lombokVersion}")
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
     compile('org.springframework.boot:spring-boot-starter-web')
 
 //    http://www.querydsl.com
 //    http://www.querydsl.com/static/querydsl/latest/reference/html/ch02.html#jpa_integration
-//    compile("com.querydsl:querydsl-jpa:${queryDSL}",
-//            "com.querydsl:querydsl-sql-spring:${queryDSL}",
-//            "com.querydsl:querydsl-apt:${queryDSL}",
-//            "com.querydsl:querydsl-core:${queryDSL}")
+    compile("com.querydsl:querydsl-jpa:${queryDSL}",
+            "com.querydsl:querydsl-sql-spring:${queryDSL}",
+            "com.querydsl:querydsl-apt:${queryDSL}",
+            "com.querydsl:querydsl-core:${queryDSL}")
 
-//TODO - найти драйвер для MSSQL
-//    compile group: 'com.microsoft.sqlserver', name: 'ms-jdbc', version: '6.5.0.jre9-preview'
+
+//  MOCK-объекты для тестов:  https://github.com/benas/random-beans
+    compile group: 'io.github.benas', name: 'random-beans', version: '3.7.0'
+
+    //Драйвера для MSSQL
+    testCompile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.0.jre8-preview'
+    testCompile group: 'com.microsoft.sqlserver', name: 'sqljdbc4', version: '4.0'
+//    compile group: 'com.microsoft', name: 'sqljdbc4', version: '3.0'
+
 
     runtime('org.springframework.boot:spring-boot-devtools')
 
