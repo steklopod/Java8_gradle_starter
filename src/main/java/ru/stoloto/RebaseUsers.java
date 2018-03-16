@@ -5,10 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+//		(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class })
 @SpringBootApplication
-//		(exclude = { DataSourceAutoConfiguration.class, HibernateJpaAutoConfiguration.class,
-//		DataSourceTransactionManagerAutoConfiguration.class })
-@EnableJpaRepositories(basePackages = "ru.stoloto.repositories.mybatis")
+@EnableJpaRepositories(basePackages = {"ru.ru.stoloto.repositories.maria"})
 @EnableTransactionManagement
 public class RebaseUsers {
 	public static void main(String[] args) {

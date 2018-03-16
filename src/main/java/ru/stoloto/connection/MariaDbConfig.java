@@ -2,10 +2,13 @@ package ru.stoloto.connection;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
@@ -27,20 +30,23 @@ import java.util.Properties;
 @EnableJpaRepositories(
         entityManagerFactoryRef = "entityManagerFactory",
         transactionManagerRef = "transactionManager",
-        basePackages = "ru.stoloto.repositories.mybatis")
+        basePackages = "ru.ru.stoloto.repositories.maria")
 @EnableTransactionManagement
-public class MyBatisDBConfig {
+public class MariaDbConfig {
 
-    @Value("${mybatis.datasource.username}")
+    @Value("${spring.jpa.hibernate.ddl-auto}")
+    private String ddlAuto;
+
+    @Value("${mariadb.datasource.username}")
     private String username;
 
-    @Value("${mybatis.datasource.password}")
+    @Value("${mariadb.datasource.password}")
     private String password;
 
-    @Value("${mybatis.datasource.url}")
+    @Value("${mariadb.datasource.url}")
     private String url;
 
-    @Value("${mybatis.datasource.driver-class-name}")
+    @Value("${mariadb.datasource.driver-class-name}")
     private String driverClassName;
 
     @Value("${pool.size}")
@@ -128,7 +134,7 @@ public class MyBatisDBConfig {
         lef.setJpaVendorAdapter(jpaVendorAdapter());
 
 //        TODO - изменить при переименовании
-        lef.setPackagesToScan("ru.stoloto.entities.mybatis");
+        lef.setPackagesToScan("ru.ru.stoloto.entities.mariadb");
 
         Properties properties = new Properties();
 //        properties.setProperty("hibernate.show_sql", "true");
@@ -140,7 +146,7 @@ public class MyBatisDBConfig {
         properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
 
 //        TODO - изменить на validate в продакшн
-        properties.setProperty("hibernate.hbm2ddl.auto", "create");
+        properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);
         lef.setJpaProperties(properties);
         lef.afterPropertiesSet();
         return lef.getObject();
@@ -151,6 +157,12 @@ public class MyBatisDBConfig {
         JpaTransactionManager tm = new JpaTransactionManager();
         tm.setEntityManagerFactory(entityManagerFactory());
         return tm;
+    }
+
+    @Bean(name = "jdbcMaria")
+    @Autowired
+    public JdbcTemplate createJdbcTemplate_ProfileService(@Qualifier("dataSource") DataSource profileServiceDS) {
+        return new JdbcTemplate(profileServiceDS);
     }
 
 

@@ -13,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.stoloto.entities.mariadb.UserRebased;
 import ru.stoloto.repositories.maria.UserOutDAO;
 
-import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -24,7 +23,7 @@ import static io.github.benas.randombeans.api.EnhancedRandom.random;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest //(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(JUnitPlatform.class)
-@Transactional
+//@Transactional
 @DisplayName("MariaDb: пишем в [Output]")
 //@Disabled
 class MariaDbTest {

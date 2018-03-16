@@ -1,6 +1,5 @@
 package ru.stoloto;
 
-import name.falgout.jeffrey.testing.junit5.MockitoExtension;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -12,17 +11,20 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
-@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@ExtendWith({SpringExtension.class})
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @IncludeTags("production")
 @ExcludeTags("ex")
+@Transactional
+
 class InitJunit5 {
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

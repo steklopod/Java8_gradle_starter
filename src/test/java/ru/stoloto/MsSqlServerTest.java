@@ -1,8 +1,6 @@
 package ru.stoloto;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
@@ -14,15 +12,15 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.stoloto.entities.mssql.Client;
 import ru.stoloto.repositories.ms.ClientInDAO;
 
-import javax.transaction.Transactional;
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest //(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(JUnitPlatform.class)
-@Transactional
+//@Transactional
 @DisplayName("MS_SQL: берем из [Input]")
 //@Disabled
 class MsSqlServerTest {
@@ -35,9 +33,18 @@ class MsSqlServerTest {
     private ClientInDAO repositoryMsSql;
 
     @Test
+    @DisplayName("MariaDb: получение по id = 1")
+    void getPersonFromMyBatis() {
+//        String nullName = "Ничего не найдено";
+        logger.info("Начинаем текстовый поиск...");
+        Optional<Client> person = repositoryMsSql.findById(1);
+        person.ifPresent((x) -> System.err.println("OK. Найденное значение - " + x));
+    }
+
+    @Test
     @DisplayName("MS_SQL: кол-во записей в таблице")
     @Tag("MsSql")
-    void testConnection(){
+    void testConnection() {
         Long aLong = repositoryMsSql.selectCount();
         System.out.println("+ С О Е Д И Н Е Н И Е  c Базой Данных У С Т А Н О В Л Е Н О +");
         System.err.println("Количество записей (строк) в таблице: " + aLong);
@@ -45,13 +52,13 @@ class MsSqlServerTest {
 
     @Test
     @DisplayName("MS_SQL: сохранение > 😱")
-    void saveInMSSQL(){
+    @RepeatedTest(5)
+    @Disabled
+    void saveInMSSQL() {
         Client person = random(Client.class);
         repositoryMsSql.saveAndFlush(person);
         System.err.println("OK. Сохранено успешно.");
     }
-
-
 
 
 //    @Test
