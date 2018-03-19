@@ -3,13 +3,14 @@ package ru.stoloto.entities.mssql;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "client")
+@Table(name = "dbo.Client")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -21,9 +22,11 @@ public class Client implements Serializable {
     private Integer id; // customer_id,
 
     @Column(name = "Email")
+    @Nullable
     private String email;
 
     @Column(name = "Phone")
+    @Nullable
     private String phone;
 
 //    TODO - проверить наличие
@@ -35,6 +38,7 @@ public class Client implements Serializable {
 
     //    TODO - перепроверить название и наличие
     @Column(name = "Islocked")
+    @Nullable
     private boolean active;
 
     //    TODO - перепроверить тип (возможен long)
@@ -55,6 +59,7 @@ public class Client implements Serializable {
      * >>> 0 - не определен; "1- Мужской; 2 - женский.
      */
     @Column(name = "Gender")
+    @Nullable
     private Integer gender;
 
     //    TODO - перепроверить тип (возможен long)
@@ -66,6 +71,7 @@ public class Client implements Serializable {
     private String firstName;
 
     @Column(name = "MiddleName")
+    @Nullable
     private String patronymic; //Отчество пользователя
 
     @Column(name = "LastName")
@@ -73,7 +79,9 @@ public class Client implements Serializable {
 
     //TODO - Если проставлен признак "1" > проставлять 'RUS'
     @Column(name = "IsResident")
+    @Nullable
     private Integer citizenship;
+
 
     /**
      * ИПОЛЬЗУЕТСЯ ПАРСИНГ:

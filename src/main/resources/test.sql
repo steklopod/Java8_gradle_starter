@@ -1,0 +1,2 @@
+
+SELECT COUNT(*) FROM Client WHERE Id < 11444191;

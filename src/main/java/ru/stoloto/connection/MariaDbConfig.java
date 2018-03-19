@@ -161,9 +161,8 @@ public class MariaDbConfig {
 
     @Bean(name = "jdbcMaria")
     @Autowired
-    public JdbcTemplate createJdbcTemplate_ProfileService(@Qualifier("dataSource") DataSource profileServiceDS) {
+    public JdbcTemplate createJdbcTemplate_maria(@Qualifier("dataSource") DataSource profileServiceDS) {
         return new JdbcTemplate(profileServiceDS);
     }
-
-
 }
+
