@@ -1,14 +1,8 @@
-### Gradle-Проект для быстрого старта с 2-мя базами данных.
+Проект для переноса списка клиентов из реплика БД BetConstruct
 
-`Java 8` 
 
-`Spring Boot 2.0`
 
-`Gradle`
-
-`JPA (Spring Data)`
-
-`Junit 5`
-
+Запуск с временной зоной:
+java -Duser.timezone=UTC  -jar build/libs/user-rebase.jar
 
 

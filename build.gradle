@@ -51,6 +51,8 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter")
     compile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
     compile group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.2.3'
+    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
+
     compile group: 'com.zaxxer', name: 'HikariCP', version: '2.7.8'
     compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.springframework.boot:spring-boot-starter-data-rest')
@@ -58,7 +60,7 @@ dependencies {
     compile("org.projectlombok:lombok:${lombokVersion}")
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
-//    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-web')
 
 //    http://www.querydsl.com
 //    http://www.querydsl.com/static/querydsl/latest/reference/html/ch02.html#jpa_integration
@@ -67,19 +69,17 @@ dependencies {
             "com.querydsl:querydsl-apt:${queryDSL}",
             "com.querydsl:querydsl-core:${queryDSL}")
 
-
 //  MOCK-объекты для тестов:  https://github.com/benas/random-beans
     compile group: 'io.github.benas', name: 'random-beans', version: '3.7.0'
 
-    //Драйвера для SQL-server:
-//    testCompile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.0.jre8-preview'
-//    testCompile group: 'com.microsoft.sqlserver', name: 'sqljdbc4', version: '4.0'
+    //Драйвера для MSSQL
+    compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.0.jre8-preview'
+//    compile group: 'com.microsoft.sqlserver', name: 'sqljdbc4', version: '4.0'
 //    compile group: 'com.microsoft', name: 'sqljdbc4', version: '3.0'
 
-    //Драйвера для MySQL:
-    compile group: 'mysql', name: 'mysql-connector-java', version: '6.0.6'
 
     runtime('org.springframework.boot:spring-boot-devtools')
+
     testCompile(
             "org.springframework.boot:spring-boot-starter-test",
             "org.assertj:assertj-core:${assertJVersion}",
@@ -87,17 +87,20 @@ dependencies {
             "org.junit.jupiter:junit-jupiter-migrationsupport:${junitJupiterVersion}",
             "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}",
             "org.junit.platform:junit-platform-runner:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}",
             "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}"
     )
-    testCompile group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.0.3'
     testRuntime group: 'junit', name: 'junit', version: '4.12'
     testRuntime group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
-//	testCompile('io.projectreactor:reactor-test')
-//	testCompile('org.springframework.security:spring-security-test')
+
 
 //	compile('org.springframework.boot:spring-boot-starter-security')
 //	compile('org.springframework.boot:spring-boot-starter-cache')
 //	compile('org.springframework.session:spring-session-core')
 //	compile('org.springframework.boot:spring-boot-starter-webflux')
 //  compile('org.springframework.boot:spring-boot-starter-actuator')
+
+//	testCompile('io.projectreactor:reactor-test')
+//	testCompile('org.springframework.security:spring-security-test')
+
 }

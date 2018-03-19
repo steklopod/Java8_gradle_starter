@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mssql.Client;
 import ru.stoloto.repositories.ms.ClientInDAO;
 
@@ -20,7 +21,7 @@ import static io.github.benas.randombeans.api.EnhancedRandom.random;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest //(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @RunWith(JUnitPlatform.class)
-//@Transactional
+@Transactional
 @DisplayName("MS_SQL: берем из [Input]")
 //@Disabled
 class MsSqlServerTest {
@@ -37,7 +38,7 @@ class MsSqlServerTest {
     void getPersonFromMyBatis() {
 //        String nullName = "Ничего не найдено";
         logger.info("Начинаем текстовый поиск...");
-        Optional<Client> person = repositoryMsSql.findById(1);
+        Optional<Client> person = repositoryMsSql.findById(11444190);
         person.ifPresent((x) -> System.err.println("OK. Найденное значение - " + x));
     }
 
@@ -50,9 +51,11 @@ class MsSqlServerTest {
         System.err.println("Количество записей (строк) в таблице: " + aLong);
     }
 
+
+
     @Test
     @DisplayName("MS_SQL: сохранение > 😱")
-    @RepeatedTest(5)
+//    @RepeatedTest(5)
     @Disabled
     void saveInMSSQL() {
         Client person = random(Client.class);
