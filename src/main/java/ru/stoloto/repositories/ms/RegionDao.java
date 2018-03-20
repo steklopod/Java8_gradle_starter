@@ -5,24 +5,22 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import ru.stoloto.entities.mssql.Client;
-
-import java.util.Set;
+import ru.stoloto.entities.mssql.Region;
 
 @Repository
 @Transactional("MsSqlTtransactionManager")
-public interface ClientInDAO extends JpaRepository<Client, Integer> {
+public interface RegionDao extends JpaRepository<Region, Integer> {
 
-    String GET_ALL_REGIONS_SQL = "SELECT RegionId FROM Client ORDER BY RegionId ASC";
-
-//    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-//    Optional<Client> findById(@Param("id") Long id);
-
-    @Query("SELECT COUNT(u) FROM Client u")
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    Long selectCount();
+    String GET_REGISTRATION_STAGE = "SELECT TOP 1 Alpha3Code\n" +
+            "FROM Region\n" +
+            "WHERE Id = ?1 AND Alpha3Code IS NOT NULL";
 
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    @Query(value = GET_ALL_REGIONS_SQL, nativeQuery = true)
-    Set<Integer> getAllRegions();
+    @Query(value = GET_REGISTRATION_STAGE, nativeQuery = true)
+    String getRegion(Integer clientId);
+
+
+    @Query("SELECT COUNT(c) FROM Region c")
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    Integer selectCount();
 }

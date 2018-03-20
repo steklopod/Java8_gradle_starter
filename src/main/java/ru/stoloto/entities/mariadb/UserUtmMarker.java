@@ -3,6 +3,7 @@ package ru.stoloto.entities.mariadb;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.NonNull;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,14 +16,13 @@ import javax.persistence.Table;
 @NoArgsConstructor
 @Data
 public class UserUtmMarker {
-    // * - Отсутствует в исходной
-    //    TODO - не заполняется
+
     @Id
     @Column(name = "user_id", columnDefinition = "INT(20)")
+    @NonNull
     private Integer userID;
 
-    // * - Отсутствует в исходной
-    //    TODO - не заполняется
     @Column(name = "utm_markers", columnDefinition = "varchar(4000)")
+    @NonNull
     private String utmMarkers;
 }

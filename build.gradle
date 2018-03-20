@@ -74,9 +74,11 @@ dependencies {
 
     //Драйвера для MSSQL
     compile group: 'com.microsoft.sqlserver', name: 'mssql-jdbc', version: '6.5.0.jre8-preview'
-//    compile group: 'com.microsoft.sqlserver', name: 'sqljdbc4', version: '4.0'
+    compile group: 'com.microsoft.sqlserver', name: 'sqljdbc4', version: '4.0'
 //    compile group: 'com.microsoft', name: 'sqljdbc4', version: '3.0'
 
+    // SimpleFlatMapper - работа с CSV
+    compile group: 'org.simpleflatmapper', name: 'sfm-csv', version: '3.16.0'
 
     runtime('org.springframework.boot:spring-boot-devtools')
 

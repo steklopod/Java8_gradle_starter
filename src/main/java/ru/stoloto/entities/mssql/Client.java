@@ -1,8 +1,6 @@
 package ru.stoloto.entities.mssql;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
@@ -12,8 +10,8 @@ import java.util.Date;
 
 @Entity
 @Table(name = "dbo.Client")
-@AllArgsConstructor
-@NoArgsConstructor
+//@AllArgsConstructor
+//@NoArgsConstructor
 @Data
 public class Client implements Serializable {
 
@@ -107,17 +105,17 @@ public class Client implements Serializable {
      * <p>
      * >>> В выгрузке одно значение = 1, остальные  =  0  ??? <<<
      */
+
     @Column(name = "IsSubscribedToNewsletter")
     @Nullable
     private boolean isSubscribedToNewsletter;
 
     @Column(name = "RegistrationSource")
-    @Nullable
-    private Integer registrationSource;
+    private Integer registrationSource;// В выгрузке все значения =  42
 
     @Column(name = "NotificationOptions")
     @Nullable
-    private Integer notificationOptions;
+    private Integer notificationOptions; // В выгрузке все значения =  0 / 2 / 3 / NULL
 
 
 }

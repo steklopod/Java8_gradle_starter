@@ -24,7 +24,7 @@ public class UserRebased implements Serializable {
         this.housing = housing;
         this.apartment = apartment;
     }
-
+//
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -32,28 +32,26 @@ public class UserRebased implements Serializable {
     @Version
     protected Integer version = 1;
 
-    @Column //(nullable = false)@NonNull
+    @Column //(nullable = false)
     @Nullable
     private String email;
 
-    @Column //(nullable = false)@NonNull
+    @Column //(nullable = false)
     @Nullable
     private String phone;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(128)") //@NonNull
     private String password;
 
-//    TODO - OneToOne
-//    @Column(name = "registration_stage_id", nullable = false, columnDefinition = "TINYINT(4)")
-//    @NonNull
-//    private Integer registrationStageId; //"4 - ожидание ЦУПИС, 10 - проверен"
+    @Column(name = "registration_stage_id"/*, nullable = false*/ , columnDefinition = "TINYINT(4)")
+    @Nullable
+    private Integer registrationStageId;
 
     @Nullable
     private String login;
 
-    @Column
-    @NonNull
-    private boolean active; // TODO- tinyint(1)
+    @Column(columnDefinition = "TINYINT(1)")
+    private boolean blocked;
 
     @Column(name = "registration_date", columnDefinition = "datetime")
     @Nullable
@@ -81,7 +79,7 @@ public class UserRebased implements Serializable {
     private String firstName;
 
     @Nullable
-    private String patronymic; //Отчество пользователя
+    private String patronymic;
 
     @Nullable
     private String surname;
@@ -166,7 +164,7 @@ public class UserRebased implements Serializable {
 
     @Column(name = "registered_in_tsupis", nullable = false)
     @NonNull
-//    TODO - проставляется на основании выгрузки из ЦУПИС
+//    TODO - из выгрузки ЦУПИС
     private boolean registeredInTsupis;
 
     @Column(name = "identified_in_tsupis", nullable = false)

@@ -1,31 +1,61 @@
 package ru.stoloto.service;
 
 import com.google.common.base.Joiner;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import ru.stoloto.entities.mariadb.RegistrtionSteps;
 import ru.stoloto.entities.mariadb.UserRebased;
 import ru.stoloto.entities.mssql.Client;
+import ru.stoloto.entities.mssql.ClientVerificationStep;
+import ru.stoloto.repositories.maria.RegistrtionStepsDAO;
+import ru.stoloto.repositories.ms.RegionDao;
+import ru.stoloto.repositories.ms.VerificationStepDAO;
 
 import java.lang.invoke.MethodHandles;
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.Optional;
+import java.util.concurrent.*;
 
 @Service
 public class Converter {
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static UserRebased convertReplacaUser(Client client) {
+    @Autowired
+    VerificationStepDAO verificationStepDAO;
+    @Autowired
+    RegionDao regionDao;
+    @Autowired
+    RegistrtionStepsDAO registrtionStepsDAO;
+
+    @SneakyThrows
+    public UserRebased convertReplacaUser(Client client) {
+        ExecutorService executor = new ForkJoinPool();
+
+        Callable<ClientVerificationStep> getVerificationStepTask = () -> {
+            Thread.currentThread().setName("Шаг верификации - получение.");
+//            Integer maxRegistrationStages = verificationStepDAO.getMaxRegistrationStages(client.getId());
+//            return verificationStepDAO.findById(client.getId()).get();
+            ClientVerificationStep maxVerificationStepObject
+                    = verificationStepDAO.getMaxVerificationStepObject(client.getId());
+            return maxVerificationStepObject;
+        };
+        Future<ClientVerificationStep> futureMaxStepObj = executor.submit(getVerificationStepTask);
+
+        Callable<String> getRegionTask = () -> {
+            Thread.currentThread().setName("Регион - получение.");
+            return regionDao.getRegion(client.getRegion());
+        };
+        Future<String> regionFuture = executor.submit(getRegionTask);
+
         String email = client.getEmail();
         String phone = client.getPhone();
-        String password = "salt:" + client.getPasswordSalt().toString() + ", " + " hash: " + client.getPasswordHash();
-//        TODO - password
-//        TODO - registration_stage_id
+        String password = client.getPasswordHash();
         String login = client.getLogin();
-//        TODO - ???Islocked -> active
-        boolean isActive = client.isActive();
         Timestamp registrationDate = client.getRegistrationDate();
         Timestamp lastModify = client.getLastModify();
         Date birthDate = client.getBirthDate();
@@ -38,69 +68,113 @@ public class Converter {
         String passportIssuer = client.getPassportIssuer();
         String passportIssuerCode = client.getPassportIssuerCode();
         Integer id = client.getId();
+        Integer registrationSource = client.getRegistrationSource();
         Integer notificationOptions = client.getNotificationOptions();
-
         boolean subscribedToNewsletter = client.isSubscribedToNewsletter();
+        boolean isActive = client.isActive();
 
-        UserRebased userToSave = UserRebased.builder()
-                .email(email)
-                .phone(phone)
-                .password(password)
-//                TODO - registration_stage_id
-                .login(login)
-                .registrationDate(registrationDate)
-                .lastModify(lastModify)
-                .firstName(firstName)
-                .patronymic(patronymic)
-                .surname(surname)
-                .birthDate(birthDate)
-//                .region(region)
-//                .gender(gender)
-//                .kladrCode(null)
-//                .newEmail(null)
-//                .citizenship(citizenship)
-                .addressString(addressString)
-                .birthPlace(birthPlace)
-                .city(city)
-                .passportIssuer(passportIssuer)
-                .passportIssuerCode(passportIssuerCode)
-                .customerId(new Long(id))
-                .swarmUserId(new Long(id))
-                .localeID(638) // ???
-                .offerState((byte) 0)
-                .isSubscribedToNewsletter(subscribedToNewsletter)
-                .registrationSource(42)
-                .notificationOptions(notificationOptions)
-                .build();
+        String region = regionFuture.get(1, TimeUnit.SECONDS);
 
-//      TODO - сделать конвертер регионов
-        convertRegionIdToString(client.getRegion(), userToSave);
+        Callable<UserRebased> createUserToSaveTask = () -> {
+            Thread.currentThread().setName("Создание пользователя для сохранения.");
 
-        convertPassport(client.getPassport(), userToSave);
-        convertCitizenship(client.isCitizen(), userToSave);
-        convertAddressToStreet(addressString, userToSave);
-        convertGender(client.getGender(), userToSave);
+            UserRebased userToSave = UserRebased.builder()
+                    .email(email)
+                    .phone(phone)
+                    .password(password)
+                    .login(login)
+                    .registrationDate(registrationDate)
+                    .lastModify(lastModify)
+                    .firstName(firstName)
+                    .patronymic(patronymic)
+                    .surname(surname)
+                    .birthDate(birthDate)
+                    .addressString(addressString)
+                    .birthPlace(birthPlace)
+                    .city(city)
+                    .passportIssuer(passportIssuer)
+                    .passportIssuerCode(passportIssuerCode)
+                    .customerId(new Long(id))
+                    .swarmUserId(new Long(id))
+                    .blocked(isActive)
+                    .localeID(1)
+                    .offerState((byte) 0)
+                    .isSubscribedToNewsletter(subscribedToNewsletter)
+                    .registrationSource(registrationSource)
+                    .notificationOptions(notificationOptions)
+                    .region(region)
+//                    .registrationStageId(registrationStageId)
+                    .build();
 
-        return userToSave;
+            convertAddressToStreet(addressString, userToSave);
+            convertPassport(client.getPassport(), userToSave);
+            convertCitizenship(client.isCitizen(), userToSave);
+            convertGender(client.getGender(), userToSave);
+
+            return userToSave;
+        };
+        Future<UserRebased> userToSaveInFuture = executor.submit(createUserToSaveTask);
+
+        UserRebased userRebased = userToSaveInFuture.get(1, TimeUnit.SECONDS);
+        
+        Optional<ClientVerificationStep> clientVerificationStep
+                = Optional.ofNullable(futureMaxStepObj.get(1, TimeUnit.SECONDS));
+        clientVerificationStep.ifPresent(x -> userRebased.setRegistrationStageId(x.getPartnerKycStepId()));
+
+        return userRebased;
     }
+
+    private void makeRegistrationStepsTable(Integer registrationStageId) {
+        RegistrtionSteps registrtionSteps;
+
+        switch (registrationStageId) {
+            case 1:
+                registrtionSteps = new RegistrtionSteps();
+                registrtionStepsDAO.saveAndFlush(registrtionSteps);
+                break;
+            case 2:
+                registrtionSteps = new RegistrtionSteps();
+                registrtionStepsDAO.saveAndFlush(registrtionSteps);
+                break;
+            case 3:
+                registrtionSteps = new RegistrtionSteps();
+                registrtionStepsDAO.saveAndFlush(registrtionSteps);
+                break;
+            case 4:
+                registrtionSteps = new RegistrtionSteps();
+                registrtionStepsDAO.saveAndFlush(registrtionSteps);
+                break;
+            default:
+                break;
+        }
+
+    }
+
 
     private static void convertPassport(@Nullable String passport, UserRebased userToSave) {
         if (passport != null) {
-            String[] split = passport.trim().split("[\\s,;-]");
-            String join = Joiner.on("").join(split);
-            if (join.length() == 10 && join.matches("[0-9]+")) {
-                String seria = join.substring(0, 4);
-                String passportNumber = join.substring(4, join.length());
-//            String passportRus = seria + " " + passportNumber;
-                userToSave.setPassportSeries(seria);
-                userToSave.setPassportNumber(passportNumber + " passportRus");
-//                TODO - ??? Тип документа удостоверяющего личность
-                userToSave.setDocumentTypeId(1);
+            String seria;
+            String passportNumber;
+            if (passport.contains("passportRus")) {
+                String[] rusPassport = passport.trim().split(";");
+                seria = rusPassport[0];
+                passportNumber = rusPassport[1] + ";passportRus";
             } else {
-                userToSave.setPassportNumber(passport);
-//                TODO - ??? Тип документа удостоверяющего личность
-                userToSave.setDocumentTypeId(0);
+                String[] split = passport.trim().split("[\\s,;]");
+                String join = Joiner.on("").join(split);
+
+                if (join.length() == 10 && join.matches("[0-9]+")) {
+                    seria = join.substring(0, 4);
+                    passportNumber = join.substring(4, join.length()) + ";passportRus";
+                    userToSave.setDocumentTypeId(1);
+                } else {
+                    passportNumber = passport;
+                    seria = null;
+                    userToSave.setDocumentTypeId(2);
+                }
             }
+            userToSave.setPassportSeries(seria);
+            userToSave.setPassportNumber(passportNumber);
         }
     }
 
@@ -117,32 +191,6 @@ public class Converter {
         }
     }
 
-    // TODO - 98шт регионов
-    private static void convertRegionIdToString(@Nullable Integer region, UserRebased userToSave) {
-        if (region != null) {
-            userToSave.setRegion(String.valueOf(region));
-        }
-//        String region;
-//        switch (region) {
-//            case 245:
-//                region = "Moscow";
-//                break;
-//            case 239:
-//                region = "Peterburg";
-//            case 237:
-//                region = "Peterburg";
-//            case 235:
-//                region = "Peterburg";
-//            case 234:
-//                region = "Peterburg";
-//            default:
-//                region = "";
-//                break;
-//        }
-//        userToSave.setRegion(region);
-    }
-
-
     private static void convertCitizenship(boolean citizenship, UserRebased userToSave) {
         String s = null;
         if (citizenship) {
@@ -152,7 +200,6 @@ public class Converter {
     }
 
     private static void convertGender(@Nullable Integer gender, UserRebased user) {
-        int answer;
         if (gender == null) {
             user.setGender(1);
         } else {
@@ -167,9 +214,4 @@ public class Converter {
         }
     }
 
-    private static Calendar convertCalendarToDate(Date registrationDate) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(registrationDate);
-        return calendar;
-    }
 }

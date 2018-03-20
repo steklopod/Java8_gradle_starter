@@ -4,6 +4,8 @@ import com.google.common.base.Joiner;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mariadb.UserRebased;
 import ru.stoloto.repositories.maria.UserOutDAO;
 import ru.stoloto.repositories.ms.ClientInDAO;
+import ru.stoloto.repositories.ms.RegionDao;
 import ru.stoloto.service.Converter;
 
 import java.lang.invoke.MethodHandles;
@@ -35,9 +38,19 @@ class Converters {
     UserOutDAO userOutDAO;
     @Autowired
     ClientInDAO repositoryMsSql;
+    @Autowired
+    RegionDao regionDao;
 
     private static final Integer id = 11563150;
 
+    @ParameterizedTest(name = "Тест #{index} для ID № [{arguments}]")
+    @ValueSource(ints = { 123, 7})
+    void region(int id) {
+        UserRebased userRebased = new UserRebased();
+//        converter.convertRegionIdToString(id, userRebased);
+        String region = regionDao.getRegion(id);
+        System.err.println(region);
+    }
 
     @Test
     @DisplayName("Парсинг номера пасспорта")

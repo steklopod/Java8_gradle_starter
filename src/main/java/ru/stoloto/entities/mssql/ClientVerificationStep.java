@@ -4,31 +4,56 @@ package ru.stoloto.entities.mssql;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import org.springframework.lang.Nullable;
 
+import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ClientVerificationStep {
+@Entity
+@Table(name = "dbo.ClientVerificationStep")
+public class ClientVerificationStep  implements Serializable {
 
     @Id
-//    @Column(name = "Id")
-    private long id;
+    @Column(name = "Id", columnDefinition = "int")
+    private Integer id;
 
-    private long clientId;
+    @Column(name = "ClientId")
+    private int clientId;
 
-    private long partnerKycStepId;
+    @Column(name = "PartnerKYCStepId")
+    @Nullable
+    private Integer partnerKycStepId;
+
+    @Column(name = "Created")
     private Timestamp created;
+
+    @Column(name = "PassDate")
     private Timestamp passDate;
-    private Timestamp expireDate;
-    private long state;
-    private String error;
-    private String code;
-    private String responseData;
-    private long source;
-    private String info;
+
+//    @Column(name = "ExpireDate")
+//    private Timestamp expireDate;
+//
+//    @Column(name = "State")
+//    private int state;
+//
+//    @Column(name = "Error")
+//    private String error;
+//
+//    @Column(name = "Code")
+//    private String code;
+//
+//    @Column(name = "ResponseData")
+//    private String responseData;
+//
+//    @Column(name = "Source")
+//    private int source;
+//
+//    @Column(name = "Info")
+//    private String info;
 
 
 }
