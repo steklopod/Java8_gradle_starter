@@ -45,15 +45,14 @@ public class MsSQLConfig {
         lef.setDataSource(msSqlDataSource());
         lef.setJpaVendorAdapter(jpaVendorAdapter);
 
-//        TODO - изменить при переименовании
         lef.setPackagesToScan("ru.stoloto.entities.mssql");
-
         Properties properties = new Properties();
         properties.setProperty("hibernate.format_sql", "true");
         properties.setProperty("hibernate.connection.shutdown", "true");
         properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
         properties.setProperty("hibernate.proc.param_null_passing", "true");
-        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
+//        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
+
         properties.setProperty("hibernate.hbm2ddl.auto", "none");
         lef.setJpaProperties(properties);
         lef.afterPropertiesSet();

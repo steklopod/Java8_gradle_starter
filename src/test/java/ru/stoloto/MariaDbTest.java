@@ -9,13 +9,16 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mariadb.UserRebased;
 import ru.stoloto.repositories.maria.UserOutDAO;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
@@ -34,19 +37,27 @@ class MariaDbTest {
     @Autowired
     private UserOutDAO userOutDAO;
 
+    @Qualifier("jdbcMaria")
+    @Autowired
+    private  JdbcTemplate jdbcTemplateMaria;
+
+    @Test
+    @DisplayName("MariaDb: добавление колонок")
+    void addColumns() {
+        userOutDAO.addColumns();
+
+    }
 
     @Test
     @DisplayName("MariaDb: получение по id = 1")
     void getPersonFromMyBatis() {
-//        String nullName = "Ничего не найдено";
-        logger.info("Начинаем текстовый поиск...");
         Optional<UserRebased> person = userOutDAO.findById(1);
         person.ifPresent((x) -> System.err.println("OK. Найденное значение - " + x));
     }
 
     @Test
     @DisplayName("MariaDb: получение по id = 1 (АСИНХР.)")
-    void testAsync(){
+    void testAsync() {
         CompletableFuture<UserRebased> oneById = userOutDAO.findOneById(1);
         UserRebased now = oneById.getNow(null);
         System.err.println("Ok. Ответ от БД получен:");
@@ -54,16 +65,11 @@ class MariaDbTest {
     }
 
     @Test
-    @DisplayName("MariaDb: сохранение > 😱")
+    @DisplayName("\uD83D\uDD25 MariaDb: сохранение ")
     @Disabled
-    void savePerson(){
+    void savePerson() {
         UserRebased user = random(UserRebased.class);
-//        user.setPassportNumber("РОССИЯ-123");
-//        user.setPassportSeries("МР");
-//        user.setSnilsNumber("Снилс №1");
-//        user.setInnNumber("Номер 666");
-//        user.setKladrCode("Код 13");
-        Object save = userOutDAO.saveAndFlush(user);
+        userOutDAO.saveAndFlush(user);
         System.err.println("OK. Сохранено успешно.");
     }
 

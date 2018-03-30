@@ -1,7 +1,8 @@
-package ru.stoloto;
+package ex;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import ru.stoloto.RebaseUsers;
 
 public class ServletInitializer extends SpringBootServletInitializer {
 

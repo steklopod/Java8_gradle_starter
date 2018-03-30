@@ -1,12 +1,10 @@
 package ru.stoloto;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -19,17 +17,18 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mariadb.UserRebased;
 import ru.stoloto.entities.mssql.Client;
-import ru.stoloto.entities.mssql.ClientVerificationStep;
 import ru.stoloto.repositories.maria.UserOutDAO;
 import ru.stoloto.repositories.ms.ClientInDAO;
 import ru.stoloto.repositories.ms.VerificationStepDAO;
 import ru.stoloto.service.Converter;
 
 import java.lang.invoke.MethodHandles;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
+
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -40,129 +39,211 @@ import java.util.stream.Stream;
 class ServiceTest {
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
-    Converter converter;
+    private Converter converter;
     @Autowired
-    UserOutDAO userOutDAO;
+    private UserOutDAO userOutDAO;
+    //    @Autowired
+//    private BetDAO betDao;
     @Autowired
-    ClientInDAO repositoryMsSql;
+    private VerificationStepDAO verificationStepDAO;
     @Autowired
-    VerificationStepDAO verificationStepDAO;
-
-
-    @Qualifier("jdbcMaria")
-    @Autowired
-    JdbcTemplate jdbcTemplateMaria;
+    private ClientInDAO repositoryMsSql;
     @Qualifier("jdbcMsSql")
     @Autowired
-    JdbcTemplate jdbcTemplateMsSql;
+    private JdbcTemplate jdbcTemplateMsSql;
 
-    private static Client client;
-    private static boolean isSaved;
+    public static volatile long count = 0;
+    private static volatile boolean isContinue = true;
+    public static volatile long countOfExistingUsers;
+    public static volatile long countOfUsersToRebase;
 
-    private static Stream<Integer> makeIDsForClientTableToGet() {
-        return Stream.of(11571919, 11591672, 11595571, 11812258, 55308090, 22225320, 11563150, 11701132);
+    private volatile static HashSet<String> generalEmails;
+    private volatile static HashSet<String> generalPhones;
+
+    private volatile static HashSet<Integer> idsFromBetRetained;
+
+    int countOfS = 0;
+    int countOfSs = 0;
+    int countOfSss = 0;
+
+    private static HashSet<String> allPhonesToRebase;
+    private static HashSet<String> allEmailsToRebase;
+
+    private static Stream<Integer> makeIDs() {
+        return Stream.of(
+                55308090, 22225320, 55238717,
+                11595571, 11701132, 11446392
+                , 11486046, 11523437, 11571919, 11591672, 11812258, 11563150
+        );
     }
 
-//    @BeforeAll
-//    static void initClient_for_Ms_Sql_DB() {
-//        logger.info("Перед каждым тестом создаем Клиента с id = 1. \n");
-//        Client clientToSave = random(Client.class);
-//        clientToSave.setId(1);
-//        client = clientToSave;
-//    }
+    private static Stream<Integer> makeIDExistInBet() {
+        return Stream.of(
+                188578, 191343, 191358, 191688, 198913, 198988, 200023, 211158, 220130, 220135, 223525, 236095, 236100, 237105, 237145, 237425, 241045, 241090
+        );
+    }
 
-//    @BeforeEach
-//    void insertClient_for_Ms_Sql_DB_with_id__1__() {
-//        if (!isSaved) {
-//            System.out.println("Сохраняем Юзера с id = 1");
-//            repositoryMsSql.saveAndFlush(client);
-//            isSaved = true;
-//        }
-//    }
+    //    @BeforeEach
+    void init() {
+        Integer count = jdbcTemplateMsSql.queryForObject("SELECT COUNT(*) FROM Bet", Integer.class);
+        System.err.println(count);
+
+        List<Integer> idsList = jdbcTemplateMsSql.queryForList("SELECT Id FROM Bet", Integer.class);
+        idsFromBetRetained = new HashSet<>(idsList);
+        System.err.println("idsFromBetRetained ДО: " + idsFromBetRetained.size());
+        HashSet<Integer> allIds = userOutDAO.findAllIds();
+        idsFromBetRetained.retainAll(allIds);
+
+        System.err.println("idsFromBetRetained ПОСЛЕ: " + idsFromBetRetained.size());
 
 
-    @DisplayName("\uD83D\uDD25 Конверсия Client -> user")
+        generalEmails = userOutDAO.findAllEmails();
+        HashSet<String> allEmailsToRebase = repositoryMsSql.findAllEmails();
+        generalEmails.retainAll(allEmailsToRebase);
+        logger.info("повторных email: " + generalEmails.size() + " шт.");
+    }
+
+    @Test
+    void sameLoginsCount() {
+        HashSet<String> sList = new HashSet<>();
+        HashSet<String> ssList = new HashSet<>();
+        HashSet<String> sssList = new HashSet<>();
+
+        List<Client> all = repositoryMsSql.findAll();
+        all.forEach(x -> {
+            String p = x.getLogin();
+            if (!sList.contains(p)) {
+                sList.add(p);
+            } else {
+                countOfS++;
+            }
+        });
+        all.forEach(x -> {
+            String p = x.getPhone();
+            if (!ssList.contains(p)) {
+                ssList.add(p);
+            } else {
+                countOfSs++;
+            }
+        });
+        all.forEach(x -> {
+                    String p = x.getEmail();
+            if (!sssList.contains(p)) {
+                sssList.add(p);
+            } else {
+                countOfSss++;
+            }
+        });
+
+        System.err.println(" ЮЗЕРОВ С ПОВТОРНЫМИ ЛОГИНАМИ " + countOfS);
+        System.err.println(" ЮЗЕРОВ С ПОВТОРНЫМИ ТЕЛЕФОНАМИ " + countOfSs);
+        System.err.println(" ЮЗЕРОВ С ПОВТОРНЫМИ ЕМЕЙЛАМИ " + countOfSss);
+
+    }
+
     @ParameterizedTest(name = "Тест #{index} для ID № [{arguments}]")
-    @MethodSource("makeIDsForClientTableToGet")
-    void firstConvert(int id) {
+    @MethodSource("makeIDExistInBet")
+    void testBetTable(int id) {
+        if (idsFromBetRetained.contains(id)) {
+            System.err.println("НАШЛИ: " + id);
+        } else {
+            throw new RuntimeException("Такого id нет в таблице BetConstract");
+        }
+
+
+    }
+
+    private boolean isEmailExist(HashSet<String> generalEmails, String email) {
+        boolean b = false;
+        if (generalEmails.contains(email.toLowerCase())) {
+            b = true;
+            System.err.println("СУЩЕСТВУЕТ, " + b);
+        }
+        return b;
+    }
+
+
+    @Test
+    @DisplayName(" 😱 ")
+    void Emails() {
+        HashSet<String> generalLogins = new HashSet<>();
+        userOutDAO.findAllLogins().forEach(x -> generalLogins.add(x.toLowerCase()));
+
+        HashSet<String> allLoginsToRebase = new HashSet<>();
+        repositoryMsSql.findAllLogins().forEach(x -> allLoginsToRebase.add(x.toLowerCase()));
+
+        boolean emailExistIn = isEmailExist(generalLogins, "Natasha15021@yandex.ru");
+        assertTrue("IN", emailExistIn);
+
+        boolean emailExistOut = isEmailExist(allLoginsToRebase, "Natasha15021@yandex.ru");
+        assertTrue("OUT", emailExistOut);
+
+        generalLogins.retainAll(allLoginsToRebase);
+
+        long sameLoginsCount = generalLogins.size();
+
+        System.err.println("Кол-во повторных email: " + sameLoginsCount + " шт.");
+
+        boolean emailExist = isEmailExist(generalLogins, "Natasha15021@yandex.ru");
+        assertTrue("Общий", emailExist);
+
+
+    }
+
+
+    @DisplayName(" 😱 Конверсия Client -> user")
+    @ParameterizedTest(name = "Тест #{index} для ID № [{arguments}]")
+    @MethodSource("makeIDs")
+    void convert(int id) {
         Optional<Client> person = repositoryMsSql.findById(id);
         Client client = person.get();
         System.err.println(client);
 
-        UserRebased userRebased = converter.convertReplacaUser(client);
-        userOutDAO.saveAndFlush(userRebased);
-        System.out.println("Успешная конвертация и сохранение в БД.");
+        Optional<UserRebased> userRebased = Optional.ofNullable(converter.convertUserForRebase(client));
+        boolean present = userRebased.isPresent();
+
+//        System.err.println("isPresent: " + present);
+//        if (present) {
+//            UserRebased userRebased2 = userRebased.get();
+//            if (isEmailExist(userRebased2.getEmail())) {
+//                System.err.println("Сохраняем ...");
+//
+//                userOutDAO.saveAndFlush(userRebased2);
+//                System.err.println("Сохранили");
+//            }
+//        } else {
+//            System.err.println("Не найден");
+//        }
     }
+
 
     @Test
-    @DisplayName("Получаем все регионы")
-    void getAllRegions() {
-        Set<Integer> allRegions = repositoryMsSql.getAllRegions();
-        System.out.println(">>> Кол-во найденных регионов: " + allRegions.size() + " шт");
-        System.err.println(allRegions);
-//        98шт регионов
-        //  null, 1, 2, 8, 10, 11, 12, 13, 14, 15, 19, 21, 22, 23, 27, 28, 30, 31, 42, 45, 48, 53, 66,
-        //  68, 73, 78, 83, 89, 90, 91, 93, 100, 108, 110, 112, 113, 114, 116, 117, 118, 122, 124, 125, 128,
-        //  130, 136, 149, 153, 154, 155, 159, 161, 168, 169, 175, 179, 188, 189, 190, 191, 195, 204, 205, 213,
-        //  219, 224, 225, 233, 234, 235, 237, 239, 240, 242, 245, 246, 248, 633, 1638, 1639, 1640, 1648, 1707,
-        //  1713, 1720, 1722, 1723, 1726, 1727, 1728, 1729, 1730, 1732, 1734, 1735, 1737, 1787, 1877
-    }
+    void runMain() {
+        Long countOfUsersToRebase = repositoryMsSql.selectCount();
+        logger.info("Начинается перенос пользователей из реплики БД BetConstruct. ");
+        logger.info("Кол-во записей для переноса:  " + countOfUsersToRebase);
 
-    @Test
-    @DisplayName("Проверка кол-ва записей  [jdbcTemplate} - \uD83C")
-    void getCount_from_ms_sql_jdbc() {
-        Integer countOfRecords = jdbcTemplateMsSql.queryForObject("SELECT COUNT(*) FROM dbo.Client", Integer.class);
-        System.err.println("Соединениу с БД установлено. Кол-во записей: " + countOfRecords);
-    }
+        try (Stream<Client> clientStream = repositoryMsSql
+                .findAll()
+                .stream()
+                .parallel()
+                .limit(100)
+        ) {
+            clientStream.forEach(x -> converter.convertUserForRebase(x));
+        }
 
-    @ParameterizedTest(name = "Тест #{index} для ID № [{arguments}]")
-    @MethodSource("makeIDsForClientTableToGet")
-    @DisplayName("SELECT User from Sql-Server By ID")
-    void getPersonFromMaria(int id) {
-        Optional<Client> person = repositoryMsSql.findById(id);
-        Client client = person.get();
-        System.out.println("Найденный User: \n");
-        person.ifPresent((x) -> System.err.println("OK. Найденное значение - " + x));
-    }
-
-    @Test
-    @DisplayName("Проверка кол-ва записей JPA")
-    void getCount_from_ms_sql_jpa() {
-        Long countOfRecords = repositoryMsSql.selectCount();
-        System.err.println("Соединениу с БД установлено. Кол-во записей: " + countOfRecords);
-    }
-
-    @ParameterizedTest(name = "Тест #{index} для ID № [{arguments}]")
-    @ValueSource(ints = {11486046, 11523437, 55238717, 11446392, 11701132})
-    @DisplayName("Проверка таблицы clientVerificationStep")
-    void clientVerificationStep(int id) {
-        int count = verificationStepDAO.selectCount();
-        System.err.println("Соединение с базой ClientVerificationStep Установлено. Кол-во записей = " + count);
-
-        List<Integer> registrationStage = verificationStepDAO.getRegistrationStages(id);
-        System.err.println(registrationStage);
-
-        Integer maxRegistrationStages = verificationStepDAO.getMaxRegistrationStages(id);
-        System.err.println(maxRegistrationStages);
-
-    }
-
-    @ParameterizedTest(name = "Тест #{index} для ID № [{arguments}]")
-    @ValueSource(ints = {11486046, 11523437, 55238717, 11446392, 11701132})
-    @Disabled
-    @SuppressWarnings("Нерабочий")
-    void getVerificationStepDao(int id) {
-
-        ClientVerificationStep maxVerificationStepObject = verificationStepDAO.getMaxVerificationStepObject(id);
-        System.err.println(maxVerificationStepObject);
-
-        Optional<Integer> partnerKycStepId = Optional.ofNullable(maxVerificationStepObject.getPartnerKycStepId());
-        System.err.println(maxVerificationStepObject.getPartnerKycStepId());
+        Long countOfRebasedUsers = userOutDAO.selectCountOfUsers();
+        logger.info(">>> Ok. Перенос завершен успешно.");
+        logger.info("Кол-во записей для переноса:  " + countOfRebasedUsers);
     }
 
 
-//    @AfterAll
-//    static void afterAll() {
-//        isSaved = false;
+//    @Autowired TestRestTemplate restTemplate;
+
+//    @Test
+//    @Disabled
+//    void testAbout() {
+//        String message = this.restTemplate.getForObject("/about", String.class);
+//        assertEquals("TEST SUCCESFUL", message);
 //    }
 }

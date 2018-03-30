@@ -1,6 +1,7 @@
 package ru.stoloto;
 
 import com.google.common.base.Joiner;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,45 +13,111 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.lang.Nullable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mariadb.UserRebased;
+import ru.stoloto.entities.mssql.Client;
 import ru.stoloto.repositories.maria.UserOutDAO;
 import ru.stoloto.repositories.ms.ClientInDAO;
 import ru.stoloto.repositories.ms.RegionDao;
 import ru.stoloto.service.Converter;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.sql.Timestamp;
+import java.util.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @Transactional
 @DisplayName("Тесты конвертации типов")
+@Disabled
 class Converters {
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
     @Autowired
-    Converter converter;
+    private Converter converter;
     @Autowired
-    UserOutDAO userOutDAO;
+    private UserOutDAO userOutDAO;
     @Autowired
-    ClientInDAO repositoryMsSql;
+    private ClientInDAO repositoryMsSql;
     @Autowired
-    RegionDao regionDao;
+    private RegionDao regionDao;
 
     private static final Integer id = 11563150;
+    private static int countsOfNotRussPassport = 0;
+    private static int countsOfRussianPassports = 0;
 
     @ParameterizedTest(name = "Тест #{index} для ID № [{arguments}]")
-    @ValueSource(ints = { 123, 7})
+    @ValueSource(ints = {123, 7})
     void region(int id) {
-        UserRebased userRebased = new UserRebased();
-//        converter.convertRegionIdToString(id, userRebased);
         String region = regionDao.getRegion(id);
         System.err.println(region);
     }
+
+    @Test
+    void milliseconds() {
+        UserRebased user = userOutDAO.findByEmail("gaponova@mail.ruu");
+        Client client = repositoryMsSql.findByEmail("gaponova@mail.ruu");
+
+        Timestamp lastModifyUser = user.getLastModify();
+        Timestamp lastModifyClient = client.getLastModify();
+
+        System.err.println("<- Created  " + lastModifyUser + "; -> last_modify: " + lastModifyClient);
+        Long duration = (long) (3600 * 1000);
+        lastModifyUser.setTime(lastModifyUser.getTime() + duration);
+
+        System.err.println("С добавкой: " + lastModifyUser);
+
+    }
+
+
+    @Test
+    void passport() {
+        List<String> allPassports = repositoryMsSql.findAllPassports();
+        allPassports.forEach(Converters::convertPassport);
+
+        System.err.println("русских: " + countsOfRussianPassports);
+        System.err.println("не русских: " + countsOfNotRussPassport);
+        System.err.println("всего: " + allPassports.size());
+
+        Set<String> notValidPassports = new HashSet<>();
+
+
+        System.out.println(notValidPassports);
+    }
+
+
+    private static void convertPassport(@Nullable String passport) {
+        if (passport != null) {
+            String seria;
+            String passportNumber;
+            if (passport.contains("passportRus")) {
+                String[] rusPassport = passport.trim().split(";");
+                seria = rusPassport[0];
+                passportNumber = rusPassport[1];
+                countsOfRussianPassports++;
+            } else {
+                String[] split = passport.trim().split("[\\s,;]");
+                String join = Joiner.on("").join(split);
+                if (join.length() == 10 && join.matches("[0-9]+")) {
+                    seria = join.substring(0, 4);
+                    passportNumber = join.substring(4, join.length());
+                    countsOfRussianPassports++;
+                } else {
+                    passportNumber = passport;
+                    countsOfNotRussPassport++;
+                }
+            }
+            if (passportNumber.length() < 11) {
+            } else {
+//                notValidPassports.add(passportNumber);
+                countsOfNotRussPassport++;
+                System.err.println(passportNumber);
+            }
+        }
+    }
+
 
     @Test
     @DisplayName("Парсинг номера пасспорта")

@@ -34,9 +34,9 @@ public class AuthLog {
     @Nullable
     private String headers;
 
-    @Column(name = "is_success", columnDefinition = "TINYINT(1)")
+    @Column(name = "is_success")
     @Nullable
-    private boolean isSuccess;
+    private Boolean isSuccess;
 
     @Column(name = "user_id", columnDefinition = "INT(11)", nullable = false)
     @NonNull

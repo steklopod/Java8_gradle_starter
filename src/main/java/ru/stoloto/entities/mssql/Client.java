@@ -9,15 +9,17 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity
-@Table(name = "dbo.Client")
-//@AllArgsConstructor
-//@NoArgsConstructor
+@Table(name = "Client")
 @Data
 public class Client implements Serializable {
 
     @Id
     @Column(name = "Id")
     private Integer id;
+
+    @Column(name = "CashDeskId")
+    @Nullable
+    private Integer CashDeskId;
 
     @Column(name = "Email")
     @Nullable
@@ -40,6 +42,10 @@ public class Client implements Serializable {
     @Column(name = "Islocked")
     @Nullable
     private boolean active;
+
+    @Column(name = "IsTest")
+    @Nullable
+    private boolean isTest;
 
     @Column(name = "Created")
     private Timestamp registrationDate;

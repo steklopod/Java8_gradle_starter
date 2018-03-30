@@ -2,8 +2,8 @@ package ru.stoloto.repositories.ms;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mssql.ClientVerificationStep;
 
@@ -15,27 +15,34 @@ import java.util.List;
 @Transactional("MsSqlTtransactionManager")
 public interface VerificationStepDAO extends JpaRepository<ClientVerificationStep, Integer> {
 
-    String GET_REGISTRATION_STAGE = "SELECT ClientVerificationStep.PartnerKYCStepId " +
-            "FROM ClientVerificationStep " +
-            "WHERE ClientId = ?1 AND PassDate IS NOT NULL";
+    String GET_MAX_REGISTRATION_STAGE = "SELECT * FROM ClientVerificationStep WHERE ClientId = ?1 AND PassDate IS NOT NULL";
 
-    String GET_VERIFICATION_STEP_Obj = "SELECT * " +
-            "FROM ClientVerificationStep " +
-            "WHERE ClientId = ?1 AND PassDate IS NOT NULL";
+    @Query(value = GET_MAX_REGISTRATION_STAGE, nativeQuery = true)
+    List<ClientVerificationStep> findStepObjWithPassDateAnd10Status(@Param("ClientId") Integer clientId);
+
+    List<ClientVerificationStep> findAllByClientId(@Param("ClientId") Integer clientId);
+
+    List<ClientVerificationStep> findAll();
+
+    default ClientVerificationStep getMaxVerificationStepObject(Integer clientId) {
+        List<ClientVerificationStep> registrationStages = findStepObjWithPassDateAnd10Status(clientId);
+        if (registrationStages.size() == 1) {
+            return registrationStages.get(0);
+        } else if (registrationStages.size() > 1) {
+            return Collections.max(registrationStages, Comparator.comparingInt(ClientVerificationStep::getStep));
+        } else {
+            return null;
+        }
+    }
 
     @Query("SELECT COUNT(c) FROM ClientVerificationStep c")
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    Integer selectCount();
+    Long selectCount();
 
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+    String GET_REGISTRATION_STAGE = "SELECT ClientVerificationStep.PartnerKYCStepId " +
+            "FROM ClientVerificationStep WHERE ClientId = ?1";
+
     @Query(value = GET_REGISTRATION_STAGE, nativeQuery = true)
     List<Integer> getRegistrationStages(Integer clientId);
-
-
-    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    @Query(value = GET_VERIFICATION_STEP_Obj, nativeQuery = true)
-    List<ClientVerificationStep> getVerificationStepObject(Integer clientId);
-
 
     default Integer getMaxRegistrationStages(Integer clientId) {
         Integer max;
@@ -47,23 +54,4 @@ public interface VerificationStepDAO extends JpaRepository<ClientVerificationSte
         }
         return max;
     }
-
-    default ClientVerificationStep getMaxVerificationStepObject(Integer clientId) {
-        ClientVerificationStep max;
-        List<ClientVerificationStep> registrationStages = getVerificationStepObject(clientId);
-        if (registrationStages.size() == 1) {
-            max = registrationStages.get(0);
-        } else if (registrationStages.size() > 1) {
-            final Comparator<ClientVerificationStep> comparator
-                    = Comparator.comparingInt(ClientVerificationStep::getPartnerKycStepId);
-            ClientVerificationStep clientVerificationStep = registrationStages.stream()
-                    .max(comparator)
-                    .get();
-            max = clientVerificationStep;
-        } else {
-            max = null;
-        }
-        return max;
-    }
-
 }

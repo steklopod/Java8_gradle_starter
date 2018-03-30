@@ -1,8 +1,0 @@
-SELECT COUNT(*)
-FROM Client
-WHERE Id < 11444191;
-
-
-SELECT TOP 1 Alpha3Code
-FROM Region
-WHERE Id = 239 AND Alpha3Code IS NOT NULL

@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Data
-@Table(name = "dbo.Region")
+@Table(name = "Region")
 @NoArgsConstructor
 @AllArgsConstructor
 public class Region {

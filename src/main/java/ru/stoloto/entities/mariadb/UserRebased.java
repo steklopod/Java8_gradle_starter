@@ -1,6 +1,9 @@
 package ru.stoloto.entities.mariadb;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -16,46 +19,38 @@ import java.util.Date;
 @Data
 @Builder
 public class UserRebased implements Serializable {
-
-    public UserRebased(String street, String houseNumber, String building, String housing, String apartment) {
-        this.street = street;
-        this.houseNumber = houseNumber;
-        this.building = building;
-        this.housing = housing;
-        this.apartment = apartment;
-    }
-//
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Version
-    protected Integer version = 1;
+    protected Integer version;
 
-    @Column //(nullable = false)
-    @Nullable
+    @Column (unique=true)
     private String email;
 
-    @Column //(nullable = false)
-    @Nullable
     private String phone;
 
     @Column(nullable = false, columnDefinition = "VARCHAR(128)") //@NonNull
     private String password;
 
     @Column(name = "registration_stage_id"/*, nullable = false*/ , columnDefinition = "TINYINT(4)")
-    @Nullable
     private Integer registrationStageId;
 
     @Nullable
     private String login;
 
-    @Column(columnDefinition = "TINYINT(1)")
-    private boolean blocked;
+//    @Column(columnDefinition = "TINYINT(1) default '0'")
+    private Boolean blocked;
 
     @Column(name = "registration_date", columnDefinition = "datetime")
     @Nullable
     private Timestamp registrationDate;
+
+//    TODO - удалить
+//    @Column(name = "registrationstageupdatedate", columnDefinition = "datetime")
+//    @Nullable
+//    private Timestamp registrationStageUpdateDate;
 
     @Column(name = "last_modify")
     @Nullable
@@ -164,20 +159,17 @@ public class UserRebased implements Serializable {
 
     @Column(name = "registered_in_tsupis", nullable = false)
     @NonNull
-//    TODO - из выгрузки ЦУПИС
     private boolean registeredInTsupis;
 
     @Column(name = "identified_in_tsupis", nullable = false)
     @NonNull
     private boolean identifiedInTsupis;
 
-    //    TODO - заполняется расчетно, исходя из шага регистрации
     @Column(name = "personality_confirmed", nullable = false)
     @NonNull
     private boolean personalityConfirmed;
 
-    //    TODO - проставляется всем по умолчанию русский 638 ??? https://mvf.klerk.ru/spr/spr63.htm
-    @Column(name = "locale_id", columnDefinition = "INT(11)")
+    @Column(name = "locale_id")
     @NonNull
     private int localeID;
 
@@ -185,7 +177,6 @@ public class UserRebased implements Serializable {
     @Nullable
     private Byte publicPersonId;
 
-    //  TODO - анализировать поле номер документа
     @Column(name = "document_type_id", columnDefinition = "TINYINT(4)")
     @Nullable
     private Integer documentTypeId;
@@ -194,7 +185,6 @@ public class UserRebased implements Serializable {
     @NonNull
     private byte blacklistCheck;
 
-    //    TODO - Предлагаем для всех резидентво проставить RUS = ???
     @Column(name = "country_id", columnDefinition = "INT(11)")
     @Nullable
     private Integer countryId;
@@ -205,7 +195,6 @@ public class UserRebased implements Serializable {
      * 2 - ALTERNATIVE;
      * 3 - UNKNOWN.
      */
-//    TODO - из выгрузки ЦУПИС
     @Column(name = "tsupis_status", columnDefinition = "TINYINT(4)")
     @Nullable
     private Byte tsupisStatus;
@@ -215,8 +204,7 @@ public class UserRebased implements Serializable {
      * 0 - FULL;
      * 1 - LIMITED.
      */
-    //    TODO - из выгрузки ЦУПИС
-    @Column(name = "ident_state", columnDefinition = "TINYINT(4)")
+    @Column(name = "identState")
     @Nullable
     private Byte identState;
 
@@ -227,8 +215,7 @@ public class UserRebased implements Serializable {
      * 3 - skype;
      * 4 - contact;
      */
-    //    TODO - из выгрузки ЦУПИС
-    @Column(columnDefinition = "TINYINT(4)")
+    @Column(name = "identType",columnDefinition = "TINYINT(4)")
     @Nullable
     private Byte identType;
 
@@ -248,7 +235,6 @@ public class UserRebased implements Serializable {
      * 3 - ошибка;
      * 4 - отвязан от ЦУПИС.
      */
-    //    TODO - из выгрузки ЦУПИС
     @Column(name = "tsupis_account_status", columnDefinition = "TINYINT(4)")
     @Nullable
     private Byte tsupisAccountStatus;
@@ -257,9 +243,9 @@ public class UserRebased implements Serializable {
     @Nullable
     private Integer tsupisError;
 
-    @Column(name = "click_for_full", columnDefinition = "TINYINT(1)")
+    @Column(name = "click_for_full")
     @Nullable
-    private Byte clickForFull;
+    private Boolean clickForFull;
 
     /**
      * Статус оферты, принята ли пользователем оферта:
@@ -281,24 +267,40 @@ public class UserRebased implements Serializable {
     @Nullable
     private Byte personalDataState;
 
-    @Column(name = "is_subscribed_to_newsletter")
-    @Nullable
-    private boolean isSubscribedToNewsletter;
+//    @Column(name = "is_subscribed_to_newsletter")
+//    @Nullable
+//    private boolean isSubscribedToNewsletter;
 
     @Column(name = "registration_source")
     private Integer registrationSource;
 
-    @Column(name = "notification_options")
+//    @Column(name = "notification_options")
+//    @Nullable
+//    private Integer notificationOptions;
+
+    @Column(name = "notify_email")
     @Nullable
-    private Integer notificationOptions;
+    private Boolean notifyEmail;
 
-    /**
-     * При загрузке клиентов, не завершивших регистрацию в ЦУПИС - очищаются перснональные данные.
-     * В этом случае необходимо здесь сохранить информацию о том, что эти данные были очищены.
-     */
-//    TODO
-    @Column(name = "is_finished_registration")
-    private boolean isFinishedRegistration;
+    @Column(name = "notify_phone")
+    @Nullable
+    private Boolean notifyPhone;
 
+
+//    @Column(name = "is_finished_registration")
+//    private boolean isFinishedRegistration;
+
+    @Column(name = "migration_state")
+    @Nullable
+    private Byte migrationState ;
+
+
+    public UserRebased(String street, String houseNumber, String building, String housing, String apartment) {
+        this.street = street;
+        this.houseNumber = houseNumber;
+        this.building = building;
+        this.housing = housing;
+        this.apartment = apartment;
+    }
 
 }
