@@ -5,22 +5,19 @@
 
 > Б. Необходимо, чтобы был установлен Gradle, в коммандной строке вводятся команды:
 
-1: 
-`cd C:\Users\d.koltovich\Desktop\projects\gamebet\user-rebase
-`
+1. `cd C:\Users\steklopod\...\user-app`
 
-2: `gradle bootJar`
+2. `gradle bootJar`
 
 3. `cd build/libs`
 
-4. ` java -jar user-rebase-SNAPSHOT.jar`
+4. `java -jar user-app-1.0.jar`
 
 -------------------------------------
 ####  ЗАПУСК исполняемого jar:
 
-`java -jar user-rebase-1.3.jar`
+`java -jar user-app-1.0.jar`
 
-Запуск с временной зоной:
 
 -Xms512m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=128m
 

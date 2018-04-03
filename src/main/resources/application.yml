@@ -11,9 +11,9 @@ mariadb:
 sql-server:
   datasource:
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    jdbc-url: "jdbc:sqlserver://10.60.170.11:1433;database=StolotoSB"
-    username: "stoloto_ro"
-    password: "3Dq3--uVQtM-d-xS"
+    jdbc-url: "jdbc:sqlserver://10.60.170.11:1433;database=steklopod"
+    username: root
+    password: root
 
 spring:
   jpa:
@@ -21,6 +21,6 @@ spring:
       ddl-auto: none
       use-new-id-generator-mappings: true
   profiles:
-    active: stoloto
+    active: steklopod
   datasource:
     continue-on-error: true
