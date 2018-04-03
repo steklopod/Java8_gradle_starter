@@ -34,9 +34,6 @@ public class Converter {
     private String filename;
     @Autowired
     private VerificationStepDAO verificationStepDAO;
-//    @Autowired
-//    private ApplicationContext ctx;
-
 
     public static HashMap<Long, String> regStepsOfTsupisHashMap = new HashMap<>();
 
@@ -46,25 +43,23 @@ public class Converter {
         if (Checker.isTrash(client)) {
             return null;
         } else {
-            ExecutorService executor = new ForkJoinPool();
-
-            Callable<ClientVerificationStep> getVerificationStepTask = () -> verificationStepDAO
-                    .getMaxVerificationStepObject(client.getId());
-            Future<ClientVerificationStep> futureMaxStepObj = executor.submit(getVerificationStepTask);
-
-            Optional<String> region = Optional.ofNullable(regionsAlpha3Diction.get(client.getRegion()));
-
-            Date birthDate = client.getBirthDate();
-            Timestamp lastModify = client.getLastModify();
-
-            Timestamp registrationDate = client.getRegistrationDate();
-            Long duration = (long) (3600 * 1000);
-            registrationDate.setTime(registrationDate.getTime() + duration);
-
-            String city = client.getCity();
+            Integer id = client.getId();
             String email = client.getEmail();
             String phone = client.getPhone();
             String login = client.getLogin();
+                addGeneralLogins(login);
+                addgeneralPhones(phone);
+                addgeneralEmails(email);
+                addIdToSet(id);
+
+            Optional<String> region = Optional.ofNullable(regionsAlpha3Diction.get(client.getRegion()));
+            Date birthDate = client.getBirthDate();
+            Timestamp lastModify = client.getLastModify();
+            Timestamp registrationDate = client.getRegistrationDate();
+            Long duration = (long) (3600 * 1000);
+            registrationDate.setTime(registrationDate.getTime() + duration);
+            String city = client.getCity();
+
             String surname = client.getSurname();
             String firstName = client.getFirstName();
             String patronymic = client.getPatronymic();
@@ -73,10 +68,15 @@ public class Converter {
             String addressString = client.getAddressString();
             String passportIssuer = client.getPassportIssuer();
             String passportIssuerCode = client.getPassportIssuerCode();
-            Integer id = client.getId();
             Integer registrationSource = client.getRegistrationSource();
             boolean isActive = client.isActive();
             Optional<Integer> notificationOptions = Optional.ofNullable(client.getNotificationOptions());
+
+            ExecutorService executor = new ForkJoinPool();
+
+            Callable<ClientVerificationStep> getVerificationStepTask = () -> verificationStepDAO
+                    .getMaxVerificationStepObject(client.getId());
+            Future<ClientVerificationStep> futureMaxStepObj = executor.submit(getVerificationStepTask);
 
             Callable<UserRebased> createUserToSaveTask = () -> {
                 UserRebased userToSave = UserRebased.builder()
@@ -120,16 +120,12 @@ public class Converter {
             Optional<ClientVerificationStep> clientVerificationStep
                     = Optional.ofNullable(futureMaxStepObj.get(3, TimeUnit.SECONDS));
             clientVerificationStep.ifPresent(x -> setVerificationStepAndOtherParameters(userRebased, clientVerificationStep.get()));
+
             executor.shutdown();
 
             if (isNotInBetTable(userRebased)) {
                 return null;
             } else {
-                addGeneralLogins(login);
-                addgeneralPhones(phone);
-                addgeneralEmails(email);
-                addIdToSet(id);
-
                 compareUserWithTsupisCSV(userRebased);
                 return userRebased;
             }

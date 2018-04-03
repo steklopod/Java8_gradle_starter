@@ -37,7 +37,8 @@ import static ru.stoloto.service.Converter.regStepsOfTsupisHashMap;
 
 @Component
 public class Starter
-        implements CommandLineRunner {
+        implements CommandLineRunner
+{
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     public static volatile long count;
@@ -70,11 +71,11 @@ public class Starter
     private volatile boolean isContinue = true;
     private volatile boolean isContinueCalculateSteps = true;
 
-    public static volatile HashSet<Long> idsFromBET;
+    public static volatile Set<Long> idsFromBET;
 
-    private static volatile HashSet<String> generalEmails;
-    private static volatile HashSet<String> generalPhones;
-    private static volatile HashSet<String> generalLogins;
+    private static volatile Set<String> generalEmails;
+    private static volatile Set<String> generalPhones;
+    private static volatile Set<String> generalLogins;
     private static volatile Set<Integer> idsSet;
 
     public static volatile Map<Integer, UserWithException> userWithExceptions;
@@ -116,7 +117,7 @@ public class Starter
         logger.info("* Prepearing is done. > OK <");
     }
 
-    @Override
+//    @Override
     public void run(String... args) throws Exception {
         checkCSVFile();
         rebaseUsersStream();
@@ -173,7 +174,6 @@ public class Starter
         };
         Callable<Void> sameIds = () -> {
             idsSet = new HashSet<>(userOutDAO.findAllIds());
-//            exeptionIds = new HashSet<>();
             userWithExceptions = new HashMap<>();
             return null;
         };
@@ -552,42 +552,32 @@ public class Starter
         return Arrays.asList(sameLogin, genPhones, sameEmails, sameIds);
     }
 
+    public static synchronized Set<String> getgeneralEmails() {
+        return generalEmails;
+    }
+    public static synchronized Set<String> getgeneralPhones() { return generalPhones; }
+    public static synchronized Set<String> getGeneralLogins() {
+        return generalLogins;
+    }
+    public static synchronized Set<Integer> getIdsSet() {
+        return idsSet;
+    }
+
+    public static synchronized void addgeneralEmails(String email) {
+        generalEmails.add(email);
+    }
+    public static synchronized void addgeneralPhones(String phone) {
+        generalPhones.add(phone);
+    }
+    public static synchronized void addGeneralLogins(String generalLogin) {
+        generalLogins.add(generalLogin);
+    }
+    public static synchronized void addIdToSet(Integer id) {
+        idsSet.add(id);
+    }
 
     static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
         Map<Object, Boolean> seen = new ConcurrentHashMap<>();
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
-
-    public static synchronized HashSet<String> getgeneralEmails() {
-        return generalEmails;
-    }
-
-    public static void addgeneralEmails(String email) {
-        generalEmails.add(email);
-    }
-
-    public static synchronized HashSet<String> getgeneralPhones() {
-        return generalPhones;
-    }
-
-    public static synchronized void addgeneralPhones(String phone) {
-        generalPhones.add(phone);
-    }
-
-    public synchronized static HashSet<String> getGeneralLogins() {
-        return generalLogins;
-    }
-
-    public static void addGeneralLogins(String generalLogin) {
-        generalLogins.add(generalLogin);
-    }
-
-    public static Set<Integer> getIdsSet() {
-        return idsSet;
-    }
-
-    public static void addIdToSet(Integer id) {
-        idsSet.add(id);
-    }
-
 }
