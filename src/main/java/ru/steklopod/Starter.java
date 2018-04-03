@@ -385,7 +385,6 @@ public class Starter
         generalLogins.clear();
         userWithExceptions.clear();
         regionsAlpha3Diction.clear();
-        System.gc();
     }
 
     private void initStepMap() {
