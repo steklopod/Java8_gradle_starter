@@ -16,6 +16,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mariadb.UserRebased;
+import ru.stoloto.entities.mariadb.UserWithException;
 import ru.stoloto.entities.mssql.Client;
 import ru.stoloto.repositories.maria.UserOutDAO;
 import ru.stoloto.repositories.ms.ClientInDAO;
@@ -23,12 +24,12 @@ import ru.stoloto.repositories.ms.VerificationStepDAO;
 import ru.stoloto.service.Converter;
 
 import java.lang.invoke.MethodHandles;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigInteger;
+import java.util.*;
 import java.util.stream.Stream;
 
-import static org.springframework.test.util.AssertionErrors.assertTrue;
+import static org.springframework.test.util.AssertionErrors.*;
+
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -83,6 +84,110 @@ class ServiceTest {
         );
     }
 
+    private static Stream<String> makeEmails() {
+        return Stream.of(
+                "ollabergan.muratov@mail.ru", "stephen.volkov@yandex.ru", "stephen.volkov@yandex.ru"
+        );
+    }
+
+    //        HashSet<Integer> finalIds = repositoryMsSql.findAllIds();
+//        System.err.println("ids BetCon. ID - " + finalIds.size() + " шт");
+//        idsMaria.retainAll(finalIds);
+//        System.err.println("ВСЕГО общих: " + finalIds.size());
+
+
+    @Test
+    void uniqueIds() {
+        Integer id = 35393009;
+        Set<Integer> idsMaria
+                = new HashSet<>(userOutDAO.findAllIds());
+
+        System.out.println("ids Maria ID - " + idsMaria.size() + " шт");
+
+        Optional<Client> client = repositoryMsSql.findById(id);
+        Optional<UserRebased> user = Optional.ofNullable(userOutDAO.findByIdMy(id));
+
+        assertTrue("НАШЛИ КЛИЕНТА: ", client.isPresent());
+        assertTrue("НАШЛИ USER: ", user.isPresent());
+
+        Integer clientID = client.get().getId();
+        Long customerId = user.get().getCustomerId();
+
+
+        assertNotEquals("Не ноль clientID", clientID, null);
+        assertNotEquals("Не  customerId", customerId, null);
+        assertEquals("РАВНЫ ", clientID, (int) (long) customerId);
+
+        System.err.println("clientID: " + clientID);
+        System.err.println("customerId: " + customerId);
+
+//     idsMaria.stream().limit(1).forEach(x -> System.out.println("idsMaria customer_id: " + x.getClass()));
+//     System.out.println("clientID: " + clientID.getClass());
+
+        if (idsMaria.contains(BigInteger.valueOf(clientID))) {
+            System.out.println("Найдено clientID: " + clientID);
+        } else {
+            throw new RuntimeException("НЕ найдено");
+        }
+    }
+
+    @Test
+    void map() {
+        Map<Integer, UserWithException> map = new HashMap<>();
+        UserWithException userWithException = new UserWithException(2);
+        Long aLong = new Long(2);
+        Integer i =  aLong.intValue();
+
+        map.put(i, userWithException);
+        UserWithException userInMap = map.get(i);
+        assertEquals("ОДИНАКОВЫЕ: ", userWithException, userInMap);
+
+        Boolean isLoginExistBefore = userInMap.getIsLoginExist();
+
+        userInMap.setIsLoginExist(true);
+
+        map.put(userInMap.getId(), userInMap);
+        assertEquals("ОДИН ЭЛЕМЕНТ: ", map.size(), 1);
+
+        Boolean isLoginExistAfter = map.get(userInMap.getId()).getIsLoginExist();
+        assertEquals("Изменен login: ", isLoginExistAfter, true);
+
+    }
+
+
+    @ParameterizedTest(name = "Тест #{index} для ID № [{arguments}]")
+    @MethodSource("makeEmails")
+    void uniqueEmails(String email) {
+        HashSet<Integer> idsMaria
+                = new HashSet<>(userOutDAO.findAllIds());
+
+        System.out.println("ids Maria ID - " + idsMaria.size() + " шт");
+        System.out.println(email);
+
+        Client client = repositoryMsSql.findByEmail(email);
+        UserRebased user = userOutDAO.findByEmail(email);
+
+        Integer clientID = client.getId();
+        Integer customerId = (int) (long) user.getCustomerId();
+
+        assertNotEquals("Не ноль clientID", clientID, null);
+        assertNotEquals("Не  customerId", customerId, null);
+        assertEquals("РАВНЫ ", clientID, customerId);
+
+        System.err.println("clientID: " + clientID);
+        System.err.println("customerId: " + customerId);
+
+
+        if (idsMaria.contains(clientID)) {
+            System.out.println("Найдено.");
+        } else {
+            System.err.println("НЕ найдено");
+        }
+
+//        assertTrue("НАЙДЕНО ms ?", idsMaria.contains(clientID));
+//        assertTrue("НАЙДЕНО my ?", idsMaria.contains(clientID));
+    }
+
     //    @BeforeEach
     void init() {
         Integer count = jdbcTemplateMsSql.queryForObject("SELECT COUNT(*) FROM Bet", Integer.class);
@@ -91,7 +196,7 @@ class ServiceTest {
         List<Integer> idsList = jdbcTemplateMsSql.queryForList("SELECT Id FROM Bet", Integer.class);
         idsFromBetRetained = new HashSet<>(idsList);
         System.err.println("idsFromBetRetained ДО: " + idsFromBetRetained.size());
-        HashSet<Integer> allIds = userOutDAO.findAllIds();
+        Set<Integer> allIds = userOutDAO.findAllIds();
         idsFromBetRetained.retainAll(allIds);
 
         System.err.println("idsFromBetRetained ПОСЛЕ: " + idsFromBetRetained.size());
@@ -102,6 +207,7 @@ class ServiceTest {
         generalEmails.retainAll(allEmailsToRebase);
         logger.info("повторных email: " + generalEmails.size() + " шт.");
     }
+
 
     @Test
     void sameLoginsCount() {
@@ -127,7 +233,7 @@ class ServiceTest {
             }
         });
         all.forEach(x -> {
-                    String p = x.getEmail();
+            String p = x.getEmail();
             if (!sssList.contains(p)) {
                 sssList.add(p);
             } else {

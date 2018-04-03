@@ -34,7 +34,8 @@ public class UserRebased implements Serializable {
     @Column(nullable = false, columnDefinition = "VARCHAR(128)") //@NonNull
     private String password;
 
-    @Column(name = "registration_stage_id"/*, nullable = false*/ , columnDefinition = "TINYINT(4)")
+    @Column(name = "registration_stage_id",columnDefinition = "TINYINT(4)")
+    @NonNull
     private Integer registrationStageId;
 
     @Nullable
@@ -47,10 +48,6 @@ public class UserRebased implements Serializable {
     @Nullable
     private Timestamp registrationDate;
 
-//    TODO - удалить
-//    @Column(name = "registrationstageupdatedate", columnDefinition = "datetime")
-//    @Nullable
-//    private Timestamp registrationStageUpdateDate;
 
     @Column(name = "last_modify")
     @Nullable
@@ -267,16 +264,8 @@ public class UserRebased implements Serializable {
     @Nullable
     private Byte personalDataState;
 
-//    @Column(name = "is_subscribed_to_newsletter")
-//    @Nullable
-//    private boolean isSubscribedToNewsletter;
-
     @Column(name = "registration_source")
     private Integer registrationSource;
-
-//    @Column(name = "notification_options")
-//    @Nullable
-//    private Integer notificationOptions;
 
     @Column(name = "notify_email")
     @Nullable
@@ -285,10 +274,6 @@ public class UserRebased implements Serializable {
     @Column(name = "notify_phone")
     @Nullable
     private Boolean notifyPhone;
-
-
-//    @Column(name = "is_finished_registration")
-//    private boolean isFinishedRegistration;
 
     @Column(name = "migration_state")
     @Nullable

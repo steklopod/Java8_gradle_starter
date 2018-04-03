@@ -18,10 +18,10 @@
 -------------------------------------
 ####  ЗАПУСК исполняемого jar:
 
-`java -jar user-rebase-SNAPSHOT.jar`
+`java -jar user-rebase-1.3.jar`
 
 Запуск с временной зоной:
 
-java -Duser.timezone=UTC  -jar build/libs/user-rebase.jar
+-Xms512m -Xmx1024m -XX:PermSize=64m -XX:MaxPermSize=128m
 
 

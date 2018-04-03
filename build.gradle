@@ -26,7 +26,9 @@ apply plugin: 'com.kncept.junit5.reporter'
 //apply plugin: 'war'
 
 group = 'ru.stoloto'
-version = 'SNAPSHOT'
+version = '1.4'
+archivesBaseName = 'user-rebase'
+
 sourceCompatibility = 1.8
 ext {
     assertJVersion = '3.9.1'
@@ -57,8 +59,7 @@ dependencies {
             'io.github.benas:random-beans:3.7.0',
     )
     compile 'org.apache.commons:commons-lang3:3.7'
-    compile group: 'commons-io', name: 'commons-io', version: '2.6'
-
+    compile 'commons-io:commons-io:2.6'
 
     compile('com.zaxxer:HikariCP:2.7.8',
             //Драйвера для MariaDB:
@@ -87,7 +88,7 @@ dependencies {
 //  compile('org.springframework.boot:spring-boot-starter-data-rest')
 
     // SimpleFlatMapper - работа с CSV
-    compile 'org.simpleflatmapper:sfm-csv:3.16.0'
+//    compile 'org.simpleflatmapper:sfm-csv:3.16.0'
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
     runtime('org.springframework.boot:spring-boot-devtools')
@@ -108,5 +109,4 @@ dependencies {
 
     testRuntime group: 'junit', name: 'junit', version: '4.12'
     testRuntime group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
-    
 }

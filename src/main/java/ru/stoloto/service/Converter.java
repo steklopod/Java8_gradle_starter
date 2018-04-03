@@ -2,46 +2,48 @@ package ru.stoloto.service;
 
 import com.google.common.base.Joiner;
 import lombok.SneakyThrows;
-import org.simpleflatmapper.csv.CsvParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import ru.stoloto.Starter;
 import ru.stoloto.entities.mariadb.UserRebased;
 import ru.stoloto.entities.mssql.Client;
 import ru.stoloto.entities.mssql.ClientVerificationStep;
-import ru.stoloto.repositories.ms.RegionDao;
 import ru.stoloto.repositories.ms.VerificationStepDAO;
 
-import java.io.File;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.concurrent.*;
 
+import static ru.stoloto.Starter.*;
+import static ru.stoloto.service.Checker.isNotInBetTable;
+
 @Service
 public class Converter {
+
     @Value("${csv.filename}")
     private String filename;
     @Autowired
     private VerificationStepDAO verificationStepDAO;
-    @Autowired
-    private RegionDao regionDao;
+//    @Autowired
+//    private ApplicationContext ctx;
 
-    private HashMap<Long, String> regStepsOfTsupisHashMap = new HashMap<>();
+
+    public static HashMap<Long, String> regStepsOfTsupisHashMap = new HashMap<>();
 
     @SneakyThrows
     public UserRebased convertUserForRebase(Client client) {
         Starter.count++;
-        if (client.getCashDeskId() != null
-                || client.isTest()
-                || isPhoneExist(client.getPhone())
-                || isEmailExist(client.getEmail())
-                || isLoginExist(client.getLogin())
-                ) {
-//            Starter.truthCountOfUsersToRebase--;
+        if (Checker.isTrash(client)) {
             return null;
         } else {
             ExecutorService executor = new ForkJoinPool();
@@ -50,9 +52,7 @@ public class Converter {
                     .getMaxVerificationStepObject(client.getId());
             Future<ClientVerificationStep> futureMaxStepObj = executor.submit(getVerificationStepTask);
 
-            Callable<String> getRegionTask = () -> regionDao
-                    .getRegion(client.getRegion());
-            Future<String> regionFuture = executor.submit(getRegionTask);
+            Optional<String> region = Optional.ofNullable(regionsAlpha3Diction.get(client.getRegion()));
 
             Date birthDate = client.getBirthDate();
             Timestamp lastModify = client.getLastModify();
@@ -76,7 +76,6 @@ public class Converter {
             Integer id = client.getId();
             Integer registrationSource = client.getRegistrationSource();
             boolean isActive = client.isActive();
-            String region = regionFuture.get(5, TimeUnit.SECONDS);
             Optional<Integer> notificationOptions = Optional.ofNullable(client.getNotificationOptions());
 
             Callable<UserRebased> createUserToSaveTask = () -> {
@@ -103,8 +102,8 @@ public class Converter {
                         .countryId(1)
                         .offerState((byte) 0)
                         .registrationSource(registrationSource)
-//                        .notificationOptions(notificationOptions)
-                        .region(region)
+                        .registrationStageId(1)
+                        .region(region.orElse(null))
                         .migrationState((byte) 1)
                         .phoneConfirmed(false)
                         .build();
@@ -113,27 +112,25 @@ public class Converter {
                 convertPassport(client.getPassport(), userToSave);
                 convertGender(client.getGender(), userToSave);
                 notificationOptions.ifPresent(o -> convertNotificationOptions(notificationOptions.get(), userToSave));
-
                 return userToSave;
             };
-
             Future<UserRebased> userToSaveInFuture = executor.submit(createUserToSaveTask);
             UserRebased userRebased = userToSaveInFuture.get(3, TimeUnit.SECONDS);
 
             Optional<ClientVerificationStep> clientVerificationStep
                     = Optional.ofNullable(futureMaxStepObj.get(3, TimeUnit.SECONDS));
-
             clientVerificationStep.ifPresent(x -> setVerificationStepAndOtherParameters(userRebased, clientVerificationStep.get()));
             executor.shutdown();
 
-            if (!userRebased.isEmailConfirmed() && !Starter.idsFromBET.contains(userRebased.getId())) {
-//                Starter.truthCountOfUsersToRebase--;
+            if (isNotInBetTable(userRebased)) {
                 return null;
             } else {
+                addGeneralLogins(login);
+                addgeneralPhones(phone);
+                addgeneralEmails(email);
+                addIdToSet(id);
+
                 compareUserWithTsupisCSV(userRebased);
-                Starter.addgeneralEmails(email);
-                Starter.addgeneralPhones(phone);
-                Starter.addGeneralLogins(login);
                 return userRebased;
             }
         }
@@ -164,13 +161,6 @@ public class Converter {
             String valueOfStepInCSV = regStepsOfTsupisHashMap.get(userRebased.getCustomerId());
             if (valueOfStepInCSV != null) {
                 switch (valueOfStepInCSV) {
-                    //email подтвержден:
-                    case "#\u008D/„":
-                        if (!Starter.idsFromBET.contains(userRebased.getId())) {
-                            clearPersonalData(userRebased);
-                        }
-                        setTsupisStatuses(userRebased, null, null, (byte) 2, null);
-                        break;
                     case "":
                         setTsupisStatuses(userRebased, (byte) 3, null, (byte) 2, (byte) 4);
                         break;
@@ -182,6 +172,13 @@ public class Converter {
                         break;
                     case "NOTIDENTIFIED":
                         setTsupisStatuses(userRebased, (byte) 3, null, (byte) 2, (byte) 0);
+                        break;
+                    //email подтвержден:
+                    default:
+                        if (!idsFromBET.contains(userRebased.getCustomerId())) {
+                            clearPersonalData(userRebased);
+                        }
+                        setTsupisStatuses(userRebased, null, null, (byte) 2, null);
                         break;
                 }
             }
@@ -212,9 +209,9 @@ public class Converter {
         userRebased.setPersonalityConfirmed(personalityConfirmed);
     }
 
-    private void setVerificationStepAndOtherParameters(UserRebased userRebased, ClientVerificationStep clientVerificationStep) {
+    private void setVerificationStepAndOtherParameters(UserRebased userRebased, ClientVerificationStep
+            clientVerificationStep) {
         Integer partnerMAXStepId = clientVerificationStep.getStep();
-//        userRebased.setRegistrationStageUpdateDate(clientVerificationStep.getPassDate());
 
         boolean isCompleted = false;
         if (clientVerificationStep.getState() == 10) {
@@ -226,7 +223,8 @@ public class Converter {
                 if (isCompleted) {
                     setVerificationStepsToUser(userRebased, 5,
                             true, false, false, false, false);
-                }else{
+                } else {
+//                    TODO - stage 1 ?
                     setVerificationStepsToUser(userRebased, 1,
                             false, false, false, false, false);
                 }
@@ -253,6 +251,7 @@ public class Converter {
                 String[] rusPassport = passport.trim().split(";");
                 seria = rusPassport[0];
                 passportNumber = rusPassport[1];
+                userToSave.setDocumentTypeId(1);
             } else {
                 String[] split = passport.trim().split("[\\s,;]");
                 String join = Joiner.on("").join(split);
@@ -265,14 +264,19 @@ public class Converter {
                     passportNumber = passport;
                     seria = null;
                     userToSave.setDocumentTypeId(2);
+                    Starter.countOfNotRusPassports++;
                 }
             }
             userToSave.setPassportSeries(seria);
-            if (passportNumber.length() < 11) {
-                userToSave.setPassportNumber(passportNumber);
-            } else {
-//                System.err.println(passportNumber);
-            }
+            userToSave.setPassportNumber(passportNumber);
+
+//            if (passportNumber.length() < 11) {
+//                userToSave.setPassportNumber(passportNumber);
+//            } else {
+//                userToSave.setDocumentTypeId(2);
+//                Starter.countOfNotRusPassports++;
+////                userToSave.setDocumentTypeId(2);
+//            }
         }
     }
 
@@ -312,25 +316,25 @@ public class Converter {
         }
     }
 
-    //    TODO
-    @SneakyThrows
     public void fillHasMapOfSteps() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        String URI = "clients.csv";
-        File file = new File(classLoader.getResource(URI).getFile());
-
-        CsvParser
-                .skip(1)
-                .forEach(file, row -> {
-                    String[] strings = row[0].split(";");
-                    Long customerId = Long.parseLong(strings[0]);
-                    String step = strings[2];
-                    regStepsOfTsupisHashMap.put(customerId, step);
-                });
+        Resource resource = new FileSystemResource(filename);
+        try (InputStream is = resource.getInputStream()) {
+            new BufferedReader(new InputStreamReader(is, "UTF-8")).lines()
+                    .skip(1)
+                    .forEach(row -> {
+                        String[] strings = row.split(";");
+                        Long customerId = Long.parseLong(strings[0]);
+                        String step = strings[2];
+                        regStepsOfTsupisHashMap.put(customerId, step);
+                    });
+        } catch (NullPointerException | IOException e) {
+            throw new RuntimeException("Ooops... CSV File >>> " + filename + "<<< NOT FOUND \n :-(. " +
+                    "\n Check the filename in application.yml \n look at csv.filename: ...");
+        }
     }
 
     private void clearPersonalData(UserRebased userRebased) {
-        Starter.countOfUsersWithoutPersonalData++;
+        countOfUsersWithoutPersonalData++;
 
         userRebased.setMigrationState((byte) 2);
         userRebased.setFirstName(null);
@@ -356,32 +360,5 @@ public class Converter {
         userRebased.setDocumentTypeId(null);
 
     }
-
-    private boolean isEmailExist(String email) {
-        boolean b = false;
-        if (Starter.getgeneralEmails().contains(email) ||
-                Starter.getgeneralEmails().contains(email.toLowerCase())) {
-            b = true;
-        }
-        return b;
-    }
-
-    private boolean isPhoneExist(String phone) {
-        boolean b = false;
-        if (Starter.getgeneralPhones().contains(phone)) {
-            b = true;
-        }
-        return b;
-    }
-
-    private boolean isLoginExist(String login) {
-        boolean b = false;
-        if (Starter.getGeneralLogins().contains(login) ||
-                Starter.getGeneralLogins().contains(login.toLowerCase())) {
-            b = true;
-        }
-        return b;
-    }
-
 
 }

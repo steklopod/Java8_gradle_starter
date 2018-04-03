@@ -42,7 +42,7 @@ class MsSqlServerTest {
 
     @Qualifier("jdbcMsSql")
     @Autowired
-    private  JdbcTemplate jdbcTemplateMsSql;
+    private JdbcTemplate jdbcTemplateMsSql;
 
     private static Stream<Integer> makeIDs() {
         return Stream.of(11571919, 11591672
@@ -57,11 +57,10 @@ class MsSqlServerTest {
     void getPersonFromSqlServer(int id) {
         Optional<Client> person = repositoryMsSql.findById(id);
         boolean present = person.isPresent();
-        if(present){
+        if (present) {
             System.out.println("OK. Найденное значение: \n");
             System.out.println(person.get() + "\n");
-        }
-        else{
+        } else {
             throw new IllegalArgumentException("Пользователь с id " + id + " не найден.");
         }
     }
@@ -72,7 +71,7 @@ class MsSqlServerTest {
     void timeStamp(int id) {
         Optional<Client> person = repositoryMsSql.findById(id);
         boolean present = person.isPresent();
-        if(present){
+        if (present) {
             Timestamp registrationDate = person.get().getRegistrationDate();
             System.err.println(registrationDate);
 
@@ -80,13 +79,20 @@ class MsSqlServerTest {
             registrationDate.setTime(registrationDate.getTime() + duration);
             System.out.println(registrationDate);
 
-
-        }
-        else{
+        } else {
             throw new IllegalArgumentException("Пользователь с id " + id + " не найден.");
         }
     }
 
+    @Test
+    void cashDesk() {
+        repositoryMsSql.findAll().parallelStream()
+                .forEach(x -> {
+                    if (x.getCashDeskId() != null) {
+                        System.err.println(x.getId());
+                    }
+                });
+    }
 
 
     @Test

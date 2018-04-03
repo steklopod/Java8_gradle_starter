@@ -3,7 +3,6 @@ package ru.stoloto.repositories.ms;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.stoloto.entities.mssql.Region;
 
@@ -15,6 +14,7 @@ public interface RegionDao extends JpaRepository<Region, Integer> {
             "FROM Region\n" +
             "WHERE Id = ?1 AND Alpha3Code IS NOT NULL";
 
+//   TODO - переделать на inMemory
     @Query(value = GET_REGISTRATION_STAGE, nativeQuery = true)
     String getRegion(Integer clientId);
 

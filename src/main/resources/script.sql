@@ -1,0 +1,5 @@
+ALTER TABLE user ADD COLUMN IF NOT EXISTS migration_state TINYINT(4);
+ALTER TABLE user ADD COLUMN IF NOT EXISTS registration_source TINYINT(4);
+ALTER TABLE user ADD COLUMN IF NOT EXISTS last_modify datetime;
+ALTER TABLE user ADD COLUMN IF NOT EXISTS notify_email bit(1);
+ALTER TABLE user ADD COLUMN IF NOT EXISTS notify_phone bit(1);

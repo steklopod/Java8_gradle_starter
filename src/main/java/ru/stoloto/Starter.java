@@ -10,10 +10,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.stoloto.entities.mariadb.UserRebased;
+import ru.stoloto.entities.mariadb.UserWithException;
 import ru.stoloto.entities.mssql.Client;
+import ru.stoloto.entities.mssql.Region;
 import ru.stoloto.repositories.maria.RegistrtionStepsDAO;
 import ru.stoloto.repositories.maria.UserOutDAO;
 import ru.stoloto.repositories.ms.ClientInDAO;
+import ru.stoloto.repositories.ms.RegionDao;
 import ru.stoloto.repositories.ms.VerificationStepDAO;
 import ru.stoloto.service.Converter;
 import ru.stoloto.service.RegistrtionStepsService;
@@ -29,33 +32,56 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
+import static ru.stoloto.service.Checker.isInBetTable;
+import static ru.stoloto.service.Converter.regStepsOfTsupisHashMap;
+
 @Component
 public class Starter
-        implements CommandLineRunner
-{
-
+        implements CommandLineRunner {
     private static Logger logger = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public static long count;
-    public static volatile int counterOfSaved;
+    public static volatile long count;
+    public static volatile long counterOfSaved;
+    public static volatile long countOfExistingSteps;
+    public static volatile long countOfUsersWithoutPersonalData;
+    public static long countOfUserRollbacks;
+    public static long countOfStepsRollbacks;
+    public static long countOfNotRusPassports;
 
-    public static long countOfExistingSteps;
-    private volatile long countOfTotalStepsToConvert;
+    public static long notConfirmedEmailWithBets;
+
+    private static long countOfSameId;
+    private static long countOfSamePhones;
+    private static long countOfTestUsers;
+    private static long countOfSameEmails;
+    private static long countOfSameLogins;
+    private static long countOfExistInBetTable;
+    private static long countOfNotNullCashDeskId;
+    private static long countOfEmptyEmails;
+    private static long countOfEmptyEmailsWithBets;
+    private static long countOfEmptyPhones;
+    private static long countOfSamePhonesWithBets;
+
+    private long countOfExistingUsers;
+    private long countOfUsersToRebase;
+    private long countOfTotalStepsToConvert;
+    private static final long truthCountOfUsersToRebase = 48059L;
 
     private volatile boolean isContinue = true;
     private volatile boolean isContinueCalculateSteps = true;
 
-    private static long countOfExistingUsers;
-    private static long countOfUsersToRebase;
-    public static long truthCountOfUsersToRebase = 46730;
-    public static long countOfUsersWithoutPersonalData;
+    public static volatile HashSet<Long> idsFromBET;
 
-    private volatile static HashSet<String> generalEmails;
-    private volatile static HashSet<String> generalPhones;
-    private volatile static HashSet<String> generalLogins;
-    public volatile static HashSet<Integer> idsFromBET;
+    private static volatile HashSet<String> generalEmails;
+    private static volatile HashSet<String> generalPhones;
+    private static volatile HashSet<String> generalLogins;
+    private static volatile Set<Integer> idsSet;
 
-    public volatile static Map<Integer, Integer> steps;
+    public static volatile Map<Integer, UserWithException> userWithExceptions;
+    public static volatile Map<Integer, String> regionsAlpha3Diction;
+
+    public static volatile Map<Integer, Integer> steps;
+
 
     @Autowired
     private Converter converter;
@@ -69,6 +95,9 @@ public class Starter
     private RegistrtionStepsService registrtionStepsService;
     @Autowired
     private RegistrtionStepsDAO registrtionStepsDAO;
+    @Autowired
+    private RegionDao regionDao;
+
     @Qualifier("jdbcMsSql")
     @Autowired
     private JdbcTemplate jdbcTemplateMsSql;
@@ -80,27 +109,52 @@ public class Starter
     @SneakyThrows
     void init() {
         ExecutorService executor = new ForkJoinPool();
-        makeInitLogging();
         List<Callable<Void>> taskList = getCallablesInitTasks();
+        makeInitLogging();
         executor.invokeAll(taskList);
         executor.shutdown();
         logger.info("* Prepearing is done. > OK <");
     }
 
-    //    @Override
+    @Override
     public void run(String... args) throws Exception {
+        checkCSVFile();
         rebaseUsersStream();
+        countTrashUsers();
+
+        ExecutorService executor = new ForkJoinPool();
+        Callable<Void> logRebasedWork = () -> {
+            Thread.currentThread().setName("LOG users->");
+            logRebasedWork();
+            return null;
+        };
+        Callable<Void> initStepMap = () -> {
+            Thread.currentThread().setName("INIT users->");
+            initStepMap();
+            return null;
+        };
+
+        List<Callable<Void>> taskList = Arrays.asList(logRebasedWork, initStepMap);
+        executor.invokeAll(taskList);
+        executor.shutdown();
+
         clearData();
-        initStepMap();
         rebaseSteps();
     }
+
+    private void checkCSVFile() {
+        if (regStepsOfTsupisHashMap.size() < 1) {
+            throw new RuntimeException("Ooops... CAN'T READ CSV FILE");
+        }
+    }
+
 
     /**
      * Инит задания. @return List<Callable<Void>>
      */
     private List<Callable<Void>> getCallablesInitTasks() {
         Callable<Void> betIDS = () -> {
-            List<Integer> idsList = jdbcTemplateMsSql.queryForList("SELECT Id FROM Bet", Integer.class);
+            List<Long> idsList = jdbcTemplateMsSql.queryForList("SELECT DISTINCT Id FROM Bet", Long.class);
             idsFromBET = new HashSet<>(idsList);
             idsList.clear();
             return null;
@@ -114,31 +168,45 @@ public class Starter
             return null;
         };
         Callable<Void> loginTask = () -> {
-            generalLogins = new HashSet<>();
-            userOutDAO.findAllLogins().forEach(x -> generalLogins.add(x.toLowerCase()));
+            generalLogins = new HashSet<>(userOutDAO.findAllLogins());
+            return null;
+        };
+        Callable<Void> sameIds = () -> {
+            idsSet = new HashSet<>(userOutDAO.findAllIds());
+//            exeptionIds = new HashSet<>();
+            userWithExceptions = new HashMap<>();
             return null;
         };
         Callable<Void> ddlTask = () -> {
             converter.fillHasMapOfSteps();
-            userOutDAO.addColumns();
             userOutDAO.skipForeignKey();
             return null;
         };
-        return Arrays.asList(emailsTask, phonesTask, loginTask, ddlTask, betIDS);
+        Callable<Void> regions = () -> {
+            regionsAlpha3Diction = new HashMap<>();
+            try (Stream<Region> regionStream = regionDao
+                    .findAll()
+                    .stream()
+                    .filter(x -> x.getAlpha2Code() != null)) {
+                regionStream
+                        .forEach(o -> regionsAlpha3Diction.put(o.getId(), o.getAlpha3Code()));
+            }
+            return null;
+        };
+
+        return Arrays.asList(emailsTask, phonesTask, loginTask, ddlTask, betIDS, sameIds, regions);
     }
 
+
     private void makeInitLogging() {
+        Thread.currentThread().setName("Init LOG");
         countOfUsersToRebase = repositoryMsSql.selectCount();
         countOfExistingUsers = userOutDAO.selectCountOfUsers();
         countOfTotalStepsToConvert = verificationStepDAO.selectCount();
-        Integer testUserCount = jdbcTemplateMsSql.queryForObject("SELECT COUNT(*) FROM Client WHERE IsTest = 1", Integer.class);
-        Integer pps = jdbcTemplateMsSql.queryForObject("SELECT COUNT(*) FROM Client  WHERE CashDeskId IS NOT NULL", Integer.class);
 
-        logger.info("---------------------------------------------");
-        logger.info(">> " + countOfExistingUsers + " of [user] exist in Stoloto table;");
-        logger.info("> " + countOfUsersToRebase + " of [Client] in BetConstract table;");
-        logger.info("  " + testUserCount + " of test [Client] in BetConstract table;");
-        logger.info("  " + pps + " of pps users;");
+        logger.info("------------------------------------------");
+        logger.info("<<  " + countOfExistingUsers + " of [user] exist in Stoloto table;");
+        logger.info(">   " + countOfUsersToRebase + " of [Client] in BetConstract table;");
     }
 
     private void rebaseUsersStream() throws InterruptedException {
@@ -163,16 +231,87 @@ public class Starter
         executor.shutdown();
     }
 
+    private void countTrashUsers() throws InterruptedException {
+        ExecutorService executor = new ForkJoinPool();
+        Callable<Void> sameId = () -> {
+            countOfSameId = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsSameId())
+                    .count();
+            return null;
+        };
+        Callable<Void> samePhone = () -> {
+            countOfSamePhones = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsPhoneExist())
+                    .count();
+            countOfSamePhonesWithBets = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsPhoneExist())
+                    .filter(o -> isInBetTable(o.getValue().getId()))
+                    .count();
+            return null;
+        };
+        Callable<Void> isTest = () -> {
+            countOfTestUsers = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsTest())
+                    .count();
+            return null;
+        };
+        Callable<Void> sameEmails = () -> {
+            countOfSameEmails = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsEmailExist())
+                    .count();
+            return null;
+        };
+        Callable<Void> sameLogins = () -> {
+            countOfSameLogins = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsLoginExist())
+                    .count();
+            return null;
+        };
+        Callable<Void> existInBetTable = () -> {
+            countOfExistInBetTable = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsCustomerIdInBetTable())
+                    .count();
+            return null;
+        };
+        Callable<Void> notNullCashDeskId = () -> {
+            countOfNotNullCashDeskId = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getNotNullCashDeskId())
+                    .count();
+            return null;
+        };
+        Callable<Void> emptyEmail = () -> {
+            countOfEmptyEmails = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsEmptyEmail())
+                    .count();
+            countOfEmptyEmailsWithBets = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsEmptyEmail())
+                    .filter(o -> isInBetTable(o.getValue().getId()))
+                    .count();
+            return null;
+        };
+        Callable<Void> emptyPhones = () -> {
+            countOfEmptyPhones = userWithExceptions.entrySet().stream()
+                    .filter(x -> x.getValue().getIsEmptyPhone())
+                    .count();
+            return null;
+        };
+        List<Callable<Void>> taskList
+                = Arrays.asList(sameId, samePhone, isTest, sameEmails, sameLogins, existInBetTable,
+                notNullCashDeskId, emptyEmail, emptyPhones);
+        executor.invokeAll(taskList);
+        executor.shutdown();
+    }
+
     /**
      * REBASE USERS.
      * Перенос пользователей.
      */
     private void rebaseUsers() {
-        logger.info("---------------------------------------------");
         logger.info(">>> STARTING REBASE USERS...");
         long startTime = System.currentTimeMillis();
         try (Stream<Client> clientStream = repositoryMsSql
-                .findAllClientsDistinctByPhone()
+//                .findAllClientsDistinctByPhone()
+                .findAll()
                 .stream()
                 .parallel()
         ) {
@@ -184,37 +323,74 @@ public class Starter
         } finally {
             isContinue = false;
         }
-//        isContinue = false;
-
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime) / 1000;
+        logger.info("\r Time: " + duration + " seconds");
 
-        logger.info("\r   >>> OK. SUCCESS REBASED: ");
-        logger.info("Time: " + duration + " seconds");
+    }
 
-        Long countOfRebasedUsers = userOutDAO.selectCountOfUsers();
+    private void logRebasedWork() {
+        Long countOfUsersAfterRebase = userOutDAO.selectCountOfUsers();
+        Integer pps = jdbcTemplateMsSql.queryForObject("SELECT COUNT(*) FROM Client  WHERE CashDeskId IS NOT NULL", Integer.class);
+        Integer testUserCount = jdbcTemplateMsSql.queryForObject("SELECT COUNT(*) FROM Client WHERE IsTest = 1", Integer.class);
+
         Integer withoutPersonalData = jdbcTemplateMaria.queryForObject("SELECT count (*)FROM user WHERE migration_state = 2", Integer.class);
+        Integer emptyPassport = jdbcTemplateMaria.queryForObject("SELECT COUNT(*) FROM user  WHERE passport_number IS NULL ", Integer.class);
+        Integer notRus = jdbcTemplateMaria.queryForObject("SELECT COUNT(*) FROM user  WHERE document_type_id =2", Integer.class);
 
-        logger.info("Total   users: " + countOfRebasedUsers);
-        logger.info("Rebased users: " + (countOfRebasedUsers - countOfExistingUsers));
-        logger.info("Not rebased users: " + (countOfUsersToRebase - (countOfRebasedUsers - countOfExistingUsers)));
-        logger.info("Deleted personal data: " + countOfUsersWithoutPersonalData);
-        logger.info("Without personal data: " + withoutPersonalData);
-        System.out.println("---------------------------");
+        long checkSum = countOfSameId + countOfNotNullCashDeskId + countOfSamePhones + countOfSameEmails + countOfSameLogins +
+                countOfTestUsers + countOfEmptyEmails + countOfEmptyPhones;
+//        logger.info("Not rebased rows : " + (countOfUsersToRebase - (countOfUsersAfterRebase - countOfExistingUsers)));
+        logger.info("NOT REBASED USERS: " + userWithExceptions.size());
+        logger.info("CHECK SUM: " + checkSum);
+        logger.info("DIFFERENCE: " + (checkSum - userWithExceptions.size()));
+
+        logger.info("   -same ids     : " + countOfSameId);
+        logger.info("   -not confirmed emails without bets : " + countOfExistInBetTable);
+        logger.info("-------------------------------");
+        logger.info("   -[pps] cahDesk not null    : " + countOfNotNullCashDeskId);
+        logger.info("   * pps  users  in BetConstr.: " + pps);
+        logger.info("-------------------------------");
+        logger.info("   -test users   : " + countOfTestUsers);
+        logger.info("   *test users in BetCons.: " + testUserCount);
+        logger.info("-------------------------------");
+        logger.info("   -empty emails : " + countOfEmptyEmails);
+        logger.info("   `empty emails with bets: " + countOfEmptyEmailsWithBets);
+        logger.info("   -empty phones : " + countOfEmptyPhones);
+        logger.info("   `empty phones with bets: " + countOfSamePhonesWithBets);
+        logger.info("-------------------------------");
+        logger.info("   >same phones  : " + countOfSamePhones);
+        logger.info("   >same emails  : " + countOfSameEmails);
+        logger.info("   >same logins  : " + countOfSameLogins);
+
+        logger.info("-------------------------------");
+        logger.info("TOTAL   USERS: " + countOfUsersAfterRebase);
+        logger.info("REBASED USERS: " + (countOfUsersAfterRebase - countOfExistingUsers));
+        logger.info("-not confirmed email with bets: " + notConfirmedEmailWithBets);
+        logger.info("~deleted personal data  : " + countOfUsersWithoutPersonalData);
+        logger.info("~not rus passport(only for rebased users): " + countOfNotRusPassports);
+
+
+//        logger.info("without personal data  : " + withoutPersonalData);
+//        logger.info("without passport number (total): " + emptyPassport);
+//        logger.info(">>> rollbacks: " + countOfUserRollbacks);
+
     }
 
     private void clearData() {
+        idsSet.clear();
+        idsFromBET.clear();
         generalEmails.clear();
         generalPhones.clear();
         generalLogins.clear();
+        userWithExceptions.clear();
+        regionsAlpha3Diction.clear();
         System.gc();
-        initStepMap();
     }
 
     private void initStepMap() {
         steps = new HashMap<>();
         registrtionStepsDAO.findAll().forEach(x -> steps.put(x.getClientId(), x.getRegistrationStageId()));
-//        System.err.println("steps.size() - " + steps.size());
     }
 
     /***************
@@ -224,7 +400,7 @@ public class Starter
     private void rebaseSteps() throws InterruptedException {
         ExecutorService executorSteps = new ForkJoinPool();
         Callable<Void> registrationSteps = () -> {
-            Thread.currentThread().setName("< -  Steps ->");
+            Thread.currentThread().setName("< -  Steps  -> ");
             makeTableOfRegistrationSteps();
             return null;
         };
@@ -236,6 +412,8 @@ public class Starter
         List<Callable<Void>> taskListSteps = Arrays.asList(
                 registrationSteps, makeProgressBarOfSTEPS);
         executorSteps.invokeAll(taskListSteps);
+
+
         executorSteps.shutdown();
     }
 
@@ -244,35 +422,31 @@ public class Starter
      * Перенос шагов регистрации
      */
     void makeTableOfRegistrationSteps() {
-        System.out.println("----------------------------------------");
+        System.out.println("-----------------------------------");
         logger.info(">>> Starting rebase steps of registration...");
-        logger.info(countOfTotalStepsToConvert + " - count of registration steps TO CONVERT;  ");
+        logger.info(countOfTotalStepsToConvert + " - count of registration stage to convert;  ");
         Integer countBefore = jdbcTemplateMaria.queryForObject("SELECT COUNT(*) FROM registrationstageupdatedate", Integer.class);
 
-//        logger.info(idsFromBET.size() + " - count of registration steps TO REBASE.");
         long startTime = System.currentTimeMillis();
 
         try (Stream<Integer> ids = repositoryMsSql
                 .findAllIds()
                 .stream()
                 .parallel()
-//             Если (user_id && stage_id) -> не переносим
         ) {
             ids.forEach(o -> verificationStepDAO.findStepObjWithPassDateAnd10Status(o)
                     .forEach(x -> registrtionStepsService.convertAndSave(x)));
         }
         isContinueCalculateSteps = false;
+
         long endTime = System.currentTimeMillis();
         long duration = (endTime - startTime) / 1000;
 
         Integer countAfter = jdbcTemplateMaria.queryForObject("SELECT COUNT(*) FROM registrationstageupdatedate", Integer.class);
-        logger.info("\r" + countAfter + " - of final  registration stage rows;");
-//        logger.info(RegistrtionStepsService.countOfSavedSteps + " - registration stage rows saved;");
-        logger.info((countAfter - countBefore) + " - registration stage rebased;");
         logger.info("Time: " + duration + " seconds.");
-
-        logger.info("SUCCESS. Ok");
-        System.out.println("----------------------------------------");
+        logger.info(countAfter + " - of final  registration stage rows;");
+        logger.info((countAfter - countBefore) + " - registration stage rebased;");
+        logger.info(">>> rollbacks: " + countOfStepsRollbacks);
     }
 
 
@@ -284,11 +458,11 @@ public class Starter
         ProgressBar pb = new ProgressBar("STEPS_OF_REG:", countOfTotalStepsToConvert);
         pb.start();
         while (isContinueCalculateSteps) {
-            Thread.sleep(1500);
+            Thread.sleep(1000);
             pb.stepTo(countOfExistingSteps);
         }
         pb.stepTo(countOfTotalStepsToConvert);
-        pb.setExtraMessage("\r SUCCESS OK<\n ");
+        pb.setExtraMessage("SUCCESS OK<\n ");
         pb.stop();
     }
 
@@ -301,7 +475,7 @@ public class Starter
             pb.stepTo(count);
         }
         pb.stepTo(countOfUsersToRebase);
-        pb.setExtraMessage("SUCCESS OK<\n ");
+        pb.setExtraMessage("SUCCESS OK< ");
         pb.stop();
     }
 
@@ -318,8 +492,64 @@ public class Starter
         long total = countOfRebasedUsers - countOfExistingUsers;
         pb.maxHint(total);
         pb.stepTo(total);
-        pb.setExtraMessage("SUCCESS OK <\n");
+        pb.setExtraMessage("SUCCESS OK<");
         pb.stop();
+    }
+
+    private List<Callable<Void>> getCallablesForUniques() {
+        logger.info(">>>Computed counts of users with not unique Phone, Emails Login:");
+//        long startTime = System.currentTimeMillis();
+
+        Callable<Void> sameIds = () -> {
+            Thread.currentThread().setName("ID's  counter");
+            HashSet<Integer> idsTemp = new HashSet<>(idsSet);
+            HashSet<Integer> idsSqlServer = repositoryMsSql.findAllIds();
+            idsSqlServer.retainAll(idsTemp);
+            int countOfSameIds = idsTemp.size();
+            idsTemp.clear();
+            idsSqlServer.clear();
+            logger.info("  -same ids: " + countOfSameIds);
+            return null;
+        };
+
+        Callable<Void> sameEmails = () -> {
+            Thread.currentThread().setName("Emails counter");
+            HashSet<String> emailsTemp = new HashSet<>(generalEmails);
+            HashSet<String> strings = repositoryMsSql.findAllEmails();
+            emailsTemp.retainAll(strings);
+            int countOfSameEmails = emailsTemp.size();
+            emailsTemp.clear();
+            strings.clear();
+            logger.info("  -same emails: " + countOfSameEmails);
+            return null;
+        };
+        Callable<Void> genPhones = () -> {
+            Thread.currentThread().setName("Phones counter");
+            HashSet<String> phonesTemp = new HashSet<>(generalPhones);
+            HashSet<String> strings = repositoryMsSql.findAllPhones();
+            phonesTemp.retainAll(strings);
+            int countOfSamePhones = phonesTemp.size();
+            phonesTemp.clear();
+            strings.clear();
+            logger.info("  -same phones: " + countOfSamePhones);
+            return null;
+        };
+        Callable<Void> sameLogin = () -> {
+            Thread.currentThread().setName("Login  counter");
+            HashSet<String> loginsTemp = new HashSet<>(generalLogins);
+            HashSet<String> strings = repositoryMsSql.findAllLogins();
+            loginsTemp.retainAll(strings);
+            int countOfSameLogins = loginsTemp.size();
+            loginsTemp.clear();
+            strings.clear();
+            logger.info("  -same logins: " + countOfSameLogins);
+            return null;
+        };
+        System.gc();
+//        long endTime = System.currentTimeMillis();
+//        long duration = (endTime - startTime) / 1000;
+//        logger.info(">>> in " + duration + " seconds.");
+        return Arrays.asList(sameLogin, genPhones, sameEmails, sameIds);
     }
 
 
@@ -328,7 +558,7 @@ public class Starter
         return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 
-    public synchronized static HashSet<String> getgeneralEmails() {
+    public static synchronized HashSet<String> getgeneralEmails() {
         return generalEmails;
     }
 
@@ -336,11 +566,11 @@ public class Starter
         generalEmails.add(email);
     }
 
-    public synchronized static HashSet<String> getgeneralPhones() {
+    public static synchronized HashSet<String> getgeneralPhones() {
         return generalPhones;
     }
 
-    public static void addgeneralPhones(String phone) {
+    public static synchronized void addgeneralPhones(String phone) {
         generalPhones.add(phone);
     }
 
@@ -351,4 +581,13 @@ public class Starter
     public static void addGeneralLogins(String generalLogin) {
         generalLogins.add(generalLogin);
     }
+
+    public static Set<Integer> getIdsSet() {
+        return idsSet;
+    }
+
+    public static void addIdToSet(Integer id) {
+        idsSet.add(id);
+    }
+
 }

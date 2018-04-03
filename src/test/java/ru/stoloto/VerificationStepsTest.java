@@ -1,6 +1,5 @@
 package ru.stoloto;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +23,7 @@ import java.util.stream.Stream;
 @RunWith(JUnitPlatform.class)
 @Transactional
 @DisplayName("Тестируем стадии верификации")
-@Disabled
+//@Disabled
 class VerificationStepsTest {
 
     @Autowired
@@ -53,7 +52,18 @@ class VerificationStepsTest {
     @ParameterizedTest(name = "Тест #{index} для [{arguments}]")
     @ValueSource(ints = {12026821, 12026838, 22225320})
     void getMaxObj(int id) {
+
+        List<ClientVerificationStep> allByClientId = verificationStepDAO.findAllByClientId(id);
+        System.err.println("size: " + allByClientId.size());
+        allByClientId.forEach(x -> {
+            System.err.println("STEP: "+x.getStep());
+            System.err.println("STATE" + x.getState());
+        });
+
         ClientVerificationStep max = verificationStepDAO.getMaxVerificationStepObject(id);
+        System.out.println("STEP: "+max.getStep());
+        System.out.println("STATE" + max.getState());
+
         if (max == null) {
             throw new RuntimeException("Чет-то не то :-(");
         }

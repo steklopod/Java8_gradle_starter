@@ -22,12 +22,13 @@ public interface ClientInDAO extends JpaRepository<Client, Integer> {
     String GET_ALL_DOC_NUMBER = "SELECT DISTINCT DocNumber FROM Client";
 
     String GET_ALL_SQL = "SELECT * FROM Client WHERE Phone IN (SELECT DISTINCT Phone FROM Client WHERE Phone IS NOT NULL)";
-    String GET_ALL_DIST_EMAIL_AND_PHONE_NOT_NULL_SQL = "SELECT * FROM Client " +
-                                    "WHERE Email IN (SELECT DISTINCT Email FROM Client WHERE Email IS NOT NULL) " +
-                                    "AND Phone IN (SELECT DISTINCT Phone FROM Client WHERE Phone IS NOT NULL)";
-    String ALL_PHONES = "select DISTINCT phone from Client";
-    String ALL_LOGINS = "select DISTINCT login from Client";
-    String GET_ALL_EMAILS = "SELECT DISTINCT Email FROM Client";
+
+//    String GET_ALL_DIST_EMAIL_AND_PHONE_NOT_NULL_SQL = "SELECT * FROM Client WHERE Email IS NOT NULL AND Phone IS NOT NULL";
+    String GET_ALL_DIST_EMAIL_AND_PHONE_NOT_NULL_SQL = "SELECT * FROM Client WHERE Phone IS NOT NULL";
+
+    String ALL_PHONES = "SELECT DISTINCT LOWER (Phone) from Client";
+    String ALL_LOGINS = "SELECT DISTINCT LOWER (Login) from Client";
+    String GET_ALL_EMAILS = "SELECT DISTINCT LOWER (Email) FROM Client";
     String ID_BY_PASSPORT = "SELECT ID FROM Client WHERE DocNumber = ?1";
 
 //    @Query(value = GET_ALL_X, nativeQuery = true)
@@ -41,7 +42,7 @@ public interface ClientInDAO extends JpaRepository<Client, Integer> {
 
     List<Client> findAll();
 
-//    @Query(value = GET_ALL_SQL, nativeQuery = true)
+    //    @Query(value = GET_ALL_SQL, nativeQuery = true)
     @Query(value = GET_ALL_DIST_EMAIL_AND_PHONE_NOT_NULL_SQL, nativeQuery = true)
     List<Client> findAllClientsDistinctByPhone();
 
@@ -49,7 +50,7 @@ public interface ClientInDAO extends JpaRepository<Client, Integer> {
     HashSet<String> findAllEmails();
 
     @Query(value = GET_ALL_IDS_SQL, nativeQuery = true)
-    Set<Integer> findAllIds();
+    HashSet<Integer> findAllIds();
 
     Optional<Client> findById(@Param("id") Long id);
 

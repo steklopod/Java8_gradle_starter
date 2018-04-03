@@ -21,10 +21,7 @@ import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
-@EnableJpaRepositories(
-        entityManagerFactoryRef = "entityManagerFactory",
-        transactionManagerRef = "transactionManager",
-        basePackages = "ru.stoloto.repositories.maria")
+@EnableJpaRepositories(basePackages = "ru.stoloto.repositories.maria")
 @EnableTransactionManagement
 public class MariaDbConfig {
 
