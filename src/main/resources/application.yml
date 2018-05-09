@@ -1,0 +1,18 @@
+
+postgres:
+  datasource:
+    driverClassName: org.postgresql.Driver
+    jdbc-url: "jdbc:postgresql://localhost:5432/home"
+    password: postgres
+    username: postgres
+
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: create
+      use-new-id-generator-mappings: true
+  profiles:
+    active: steklopod
+  datasource:
+    continue-on-error: true
