@@ -3,14 +3,21 @@ buildscript {
         springBootVersion = '2.0.0.RELEASE'
     }
     repositories {
+        jcenter()
+        mavenLocal()
         mavenCentral()
         maven { url "https://repo.spring.io/snapshot" }
         maven { url "https://repo.spring.io/milestone" }
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
         classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.3'
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.17.0"// dependencyUpdates
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2" //SonarQube analysis
+        classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:0.1.0-RELEASE" //long class-path fixing
     }
 }
 plugins {
@@ -20,9 +27,13 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'org.sonarqube'
+apply plugin: 'project-report'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'com.kncept.junit5.reporter'
+apply plugin: "com.github.ManifestClasspath"
+apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'org.junit.platform.gradle.plugin'
 //apply plugin: 'war'
 
 group = 'ru.steklopod'
@@ -38,6 +49,7 @@ ext {
     lombokVersion = '1.16.20'
     springBootVersion = '2.0.0.RELEASE'
     queryDSL = '4.1.4'
+    JUNIT_VERSION = '4.12'
 }
 ext['spring.version'] = '5.0.4.RELEASE'
 
@@ -45,6 +57,9 @@ repositories {
     mavenCentral()
     maven { url "https://repo.spring.io/snapshot" }
     maven { url "https://repo.spring.io/milestone" }
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://jitpack.io' }
+    jcenter()
 }
 
 dependencies {
@@ -57,9 +72,10 @@ dependencies {
             'org.springframework.boot:spring-boot-starter-validation:2.0.0.RELEASE',
             //  MOCK-объекты для тестов:  https://github.com/benas/random-beans
             'io.github.benas:random-beans:3.7.0',
+            'io.github.glytching:junit-extensions:2.1.0',
+            'org.tuxdude.logback.extensions:logback-colorizer:1.0.1',
+            'me.tongfei:progressbar:0.6.0'
     )
-    compile 'org.apache.commons:commons-lang3:3.7'
-    compile 'commons-io:commons-io:2.6'
 
     compile('com.zaxxer:HikariCP:2.7.8',
             //Драйвера для MariaDB:
@@ -70,43 +86,38 @@ dependencies {
 
     )
 
-    compile 'me.tongfei:progressbar:0.6.0'
-    compile 'com.google.guava:guava:24.1-jre'
-
 //    http://www.querydsl.com
 //    compile("com.querydsl:querydsl-jpa:${queryDSL}",
 //            "com.querydsl:querydsl-sql-spring:${queryDSL}",
 //            "com.querydsl:querydsl-apt:${queryDSL}",
 //            "com.querydsl:querydsl-core:${queryDSL}")
 
-//  compile('org.springframework.boot:spring-boot-starter-web')
-//	compile('org.springframework.boot:spring-boot-starter-security')
-//	compile('org.springframework.boot:spring-boot-starter-cache')
-//	compile('org.springframework.session:spring-session-core')
-//	compile('org.springframework.boot:spring-boot-starter-webflux')
-//  compile('org.springframework.boot:spring-boot-starter-actuator')
-//  compile('org.springframework.boot:spring-boot-starter-data-rest')
-
-    // SimpleFlatMapper - работа с CSV
-//    compile 'org.simpleflatmapper:sfm-csv:3.16.0'
+    compile('org.springframework.boot:spring-boot-starter-data-rest',
+            'org.mockito:mockito-core:2.15.0')
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
     runtime('org.springframework.boot:spring-boot-devtools')
 
-    testCompile(
-            "org.springframework.boot:spring-boot-starter-test",
+    testCompile("org.springframework.boot:spring-boot-starter-test",
+            "io.github.glytching:junit-extensions:2.1.0",
+            "com.github.sbrannen:spring-test-junit5:1.0.3",
+            "junit:junit:${JUNIT_VERSION}",
             "org.assertj:assertj-core:${assertJVersion}",
+            "name.falgout.jeffrey.testing.junit5:mockito-extension:1.0.1",
+            "org.jetbrains.spek:spek-junit-platform-engine:1.1.5",
+            // Needed for @RunWith(JUnitPlatform.class) in the IDE
+            "org.junit.platform:junit-platform-runner:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-console:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-console-standalone:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-suite-api:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-commons:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-engine:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-surefire-provider:${junitPlatformVersion}",
             "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}",
             "org.junit.jupiter:junit-jupiter-migrationsupport:${junitJupiterVersion}",
-            "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}",
-            "org.junit.platform:junit-platform-runner:${junitPlatformVersion}",
-            "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}",
-            "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}",
-            'name.falgout.jeffrey.testing.junit5:mockito-extension:1.0.0'
     )
-//	testCompile('io.projectreactor:reactor-test')
-//	testCompile('org.springframework.security:spring-security-test')
-
-    testRuntime group: 'junit', name: 'junit', version: '4.12'
-    testRuntime group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
+    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+    testRuntime("org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}") {}
+    // Only needed to run tests in an IDE that bundles an older version
+    testRuntime("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}") {}
 }

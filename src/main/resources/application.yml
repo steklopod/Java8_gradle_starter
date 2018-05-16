@@ -6,12 +6,13 @@ postgres:
     password: postgres
     username: postgres
 
-
 spring:
   jpa:
     hibernate:
       ddl-auto: create
       use-new-id-generator-mappings: true
+#    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: false
   profiles:
     active: steklopod
   datasource:

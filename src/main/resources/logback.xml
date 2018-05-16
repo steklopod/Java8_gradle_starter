@@ -1,0 +1,36 @@
+<configuration>
+    <property scope="context" name="COLORIZER_COLORS" value="boldred@white,yellow@black,green@,blue@,cyan@"/>
+    <!--<property scope="context" name="COLORIZER_COLORS" value="white@magenta,boldyellow@black,green@white,boldblue@,@" />-->
+    <conversionRule conversionWord="colorize" converterClass="org.tuxdude.logback.extensions.LogColorizer"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.out</target>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>INFO</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <encoder>
+            <charset>UTF-8</charset>
+            <!--  Если нужен вывод даты -  %d{yyyy-MM-dd HH:mm:ss.SSS} -->
+            <!--<pattern>%d{HH:mm:ss} [%thread] %-5level %class{0}.%method %logger{36} - %colorize(%msg)\n</pattern>-->
+            <pattern>%d{HH:mm:ss} [%thread] %logger{40} - %colorize(%msg)\n</pattern>
+        </encoder>
+    </appender>
+
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <logger name="ch.qos.logback" level="INFO"/>
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="org.springframework.beans" level="INFO"/>
+    <logger name="org.hibernate" value="INFO"/>
+
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+</configuration>
