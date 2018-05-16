@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.0.RELEASE'
+        springBootVersion = '2.0.2.RELEASE'
     }
     repositories {
         jcenter()
@@ -13,15 +13,15 @@ buildscript {
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.3'
+        classpath 'com.kncept.junit5.reporter:junit-reporter:1.1.0'
         classpath "com.github.ben-manes:gradle-versions-plugin:0.17.0"// dependencyUpdates
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.2.0'
         classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2" //SonarQube analysis
         classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:0.1.0-RELEASE" //long class-path fixing
     }
 }
 plugins {
-    id 'io.spring.dependency-management' version '1.0.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.5.RELEASE'
 }
 
 apply plugin: 'java'
@@ -42,12 +42,12 @@ archivesBaseName = 'user-app'
 
 sourceCompatibility = 1.8
 ext {
-    assertJVersion = '3.9.1'
-    junitJupiterVersion = '5.1.0'
-    junitPlatformVersion = '1.1.0'
+    assertJVersion = '3.10.0'
+    junitJupiterVersion = '5.2.0'
+    junitPlatformVersion = '1.2.0'
     junitVintageVersion = '5.1.0'
     lombokVersion = '1.16.20'
-    springBootVersion = '2.0.0.RELEASE'
+    springBootVersion = '2.0.2.RELEASE'
     queryDSL = '4.1.4'
     JUNIT_VERSION = '4.12'
 }
@@ -68,22 +68,21 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter",
             "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}",
             "org.projectlombok:lombok:${lombokVersion}",
-            'org.springframework.boot:spring-boot-starter-data-jpa:2.0.0.RELEASE',
-            'org.springframework.boot:spring-boot-starter-validation:2.0.0.RELEASE',
+            "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}",
+            "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}",
             //  MOCK-объекты для тестов:  https://github.com/benas/random-beans
-            'io.github.benas:random-beans:3.7.0',
-            'io.github.glytching:junit-extensions:2.1.0',
-            'org.tuxdude.logback.extensions:logback-colorizer:1.0.1',
-            'me.tongfei:progressbar:0.6.0'
+            "io.github.benas:random-beans:3.7.0",
+            "io.github.glytching:junit-extensions:2.1.0",
+            "org.tuxdude.logback.extensions:logback-colorizer:1.0.1",
+            "me.tongfei:progressbar:0.7.0"
     )
 
-    compile('com.zaxxer:HikariCP:2.7.8',
+    compile('com.zaxxer:HikariCP:3.1.0',
             //Драйвера для MariaDB:
-            'org.mariadb.jdbc:mariadb-java-client:2.2.3',
-            'mysql:mysql-connector-java:6.0.6',
+            'org.mariadb.jdbc:mariadb-java-client:2.2.4',
+            'mysql:mysql-connector-java:8.0.11',
             //Драйвера для Postgres:
             'org.postgresql:postgresql:42.2.2'
-
     )
 
 //    http://www.querydsl.com
@@ -93,7 +92,7 @@ dependencies {
 //            "com.querydsl:querydsl-core:${queryDSL}")
 
     compile('org.springframework.boot:spring-boot-starter-data-rest',
-            'org.mockito:mockito-core:2.15.0')
+            'org.mockito:mockito-core:2.18.3')
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
     runtime('org.springframework.boot:spring-boot-devtools')
