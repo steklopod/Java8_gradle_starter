@@ -23,7 +23,7 @@ import java.util.Properties;
 @Configuration
 @EnableJpaRepositories(basePackages = "ru.steklopod.repositories")
 @EnableTransactionManagement
-public class MariaDbConfig {
+public class DatabaseConfig {
 
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
