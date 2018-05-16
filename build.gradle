@@ -70,6 +70,8 @@ dependencies {
             "org.projectlombok:lombok:${lombokVersion}",
             "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}",
             "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}",
+            "org.springframework.boot:spring-boot-starter-data-rest",
+            "org.mockito:mockito-core:2.18.3",
             //  MOCK-объекты для тестов:  https://github.com/benas/random-beans
             "io.github.benas:random-beans:3.7.0",
             "io.github.glytching:junit-extensions:2.1.0",
@@ -90,9 +92,6 @@ dependencies {
 //            "com.querydsl:querydsl-sql-spring:${queryDSL}",
 //            "com.querydsl:querydsl-apt:${queryDSL}",
 //            "com.querydsl:querydsl-core:${queryDSL}")
-
-    compile('org.springframework.boot:spring-boot-starter-data-rest',
-            'org.mockito:mockito-core:2.18.3')
 
     compileOnly('org.springframework.boot:spring-boot-configuration-processor')
     runtime('org.springframework.boot:spring-boot-devtools')
@@ -115,8 +114,8 @@ dependencies {
             "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}",
             "org.junit.jupiter:junit-jupiter-migrationsupport:${junitJupiterVersion}",
     )
-    testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
-    testRuntime("org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}") {}
-    // Only needed to run tests in an IDE that bundles an older version
-    testRuntime("org.junit.platform:junit-platform-launcher:${junitPlatformVersion}") {}
+    testRuntime(
+            "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}",
+            "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}",
+            "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
 }
