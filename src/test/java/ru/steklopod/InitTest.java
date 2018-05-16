@@ -22,15 +22,14 @@ import ru.steklopod.repositories.UserDao;
 import java.util.stream.IntStream;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Slf4j
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
 @Transactional
-class MariaDbTest {
+class InitTest {
 
     @Autowired
     private UserDao userDao;
@@ -84,6 +83,13 @@ class MariaDbTest {
         assertFalse(contained2);
         assertTrue(contained3);
         assertFalse(contained4);
+
+        String s2 = "welcome to www.steklopod.com";
+        int charNum = StringUtils.countMatches(s2, 'w');
+        int stringNum = StringUtils.countMatches(s2, "com");
+
+        assertEquals(4, charNum);
+        assertEquals(2, stringNum);
     }
 
 }
