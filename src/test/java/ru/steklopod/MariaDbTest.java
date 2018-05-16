@@ -3,6 +3,7 @@ package ru.steklopod;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import lombok.extern.slf4j.Slf4j;
 import name.falgout.jeffrey.testing.junit.mockito.MockitoExtension;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ import ru.steklopod.repositories.UserDao;
 import java.util.stream.IntStream;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
 @SpringBootTest
@@ -67,6 +70,20 @@ class MariaDbTest {
 
         IntStream.range(1, 5)
                 .reduce(1, (x, y) -> x * y);       // > 24
+    }
+
+    @Test
+    void stringUtils() {
+        String string = "abba.com";
+        boolean contained1 = StringUtils.containsAny(string, 'a', 'b', 'c');
+        boolean contained2 = StringUtils.containsAny(string, 'x', 'y', 'z');
+        boolean contained3 = StringUtils.containsAny(string, "abc");
+        boolean contained4 = StringUtils.containsAny(string, "xyz");
+
+        assertTrue(contained1);
+        assertFalse(contained2);
+        assertTrue(contained3);
+        assertFalse(contained4);
     }
 
 }
