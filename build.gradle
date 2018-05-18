@@ -1,28 +1,39 @@
 buildscript {
     ext {
-        springBootVersion = '2.0.0.RELEASE'
+        springBootVersion = '2.0.2.RELEASE'
     }
     repositories {
+        jcenter()
+        mavenLocal()
         mavenCentral()
         maven { url "https://repo.spring.io/snapshot" }
         maven { url "https://repo.spring.io/milestone" }
+        maven { url "https://plugins.gradle.org/m2/" }
+        maven { url "https://jitpack.io" }
     }
     dependencies {
         classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
-        classpath 'com.kncept.junit5.reporter:junit-reporter:1.0.3'
+        classpath "com.kncept.junit5.reporter:junit-reporter:1.1.0"
+        classpath "com.github.ben-manes:gradle-versions-plugin:0.17.0"// dependencyUpdates
+        classpath "org.junit.platform:junit-platform-gradle-plugin:1.2.0"
+        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.2" //SonarQube analysis
+        classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:0.1.0-RELEASE" //long class-path fixing
     }
 }
 plugins {
-    id 'io.spring.dependency-management' version '1.0.4.RELEASE'
+    id 'io.spring.dependency-management' version '1.0.5.RELEASE'
 }
 
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'org.sonarqube'
+apply plugin: 'project-report'
 apply plugin: 'org.springframework.boot'
-apply plugin: 'org.junit.platform.gradle.plugin'
 apply plugin: 'com.kncept.junit5.reporter'
+apply plugin: "com.github.ManifestClasspath"
+apply plugin: 'com.github.ben-manes.versions'
+apply plugin: 'org.junit.platform.gradle.plugin'
 //apply plugin: 'war'
 
 group = 'ru.steklopod'
@@ -31,13 +42,14 @@ archivesBaseName = 'user-app'
 
 sourceCompatibility = 1.8
 ext {
-    assertJVersion = '3.9.1'
-    junitJupiterVersion = '5.1.0'
-    junitPlatformVersion = '1.1.0'
+    assertJVersion = '3.10.0'
+    junitJupiterVersion = '5.2.0'
+    junitPlatformVersion = '1.2.0'
     junitVintageVersion = '5.1.0'
     lombokVersion = '1.16.20'
-    springBootVersion = '2.0.0.RELEASE'
+    springBootVersion = '2.0.2.RELEASE'
     queryDSL = '4.1.4'
+    JUNIT_VERSION = '4.12'
 }
 ext['spring.version'] = '5.0.4.RELEASE'
 
@@ -45,6 +57,9 @@ repositories {
     mavenCentral()
     maven { url "https://repo.spring.io/snapshot" }
     maven { url "https://repo.spring.io/milestone" }
+    maven { url 'https://plugins.gradle.org/m2/' }
+    maven { url 'https://jitpack.io' }
+    jcenter()
 }
 
 dependencies {
@@ -53,25 +68,24 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter",
             "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}",
             "org.projectlombok:lombok:${lombokVersion}",
-            'org.springframework.boot:spring-boot-starter-data-jpa:2.0.0.RELEASE',
-            'org.springframework.boot:spring-boot-starter-validation:2.0.0.RELEASE',
+            "org.springframework.boot:spring-boot-starter-data-jpa:${springBootVersion}",
+            "org.springframework.boot:spring-boot-starter-validation:${springBootVersion}",
+            "org.springframework.boot:spring-boot-starter-data-rest",
+            "org.mockito:mockito-core:2.18.3",
             //  MOCK-объекты для тестов:  https://github.com/benas/random-beans
-            'io.github.benas:random-beans:3.7.0',
+            "io.github.benas:random-beans:3.7.0",
+            "io.github.glytching:junit-extensions:2.1.0",
+            "org.tuxdude.logback.extensions:logback-colorizer:1.0.1",
+            "me.tongfei:progressbar:0.7.0",
+            "org.apache.commons:commons-lang3:3.5"
     )
-    compile 'org.apache.commons:commons-lang3:3.7'
-    compile 'commons-io:commons-io:2.6'
-
-    compile('com.zaxxer:HikariCP:2.7.8',
+    compile("com.zaxxer:HikariCP:3.1.0",
             //Драйвера для MariaDB:
-            'org.mariadb.jdbc:mariadb-java-client:2.2.3',
-            'mysql:mysql-connector-java:6.0.6',
-            //Драйвера для MSSQL
-            'com.microsoft.sqlserver:mssql-jdbc:6.5.0.jre8-preview',
-//            'com.microsoft.sqlserver:sqljdbc4:4.0'
+            "org.mariadb.jdbc:mariadb-java-client:2.2.4",
+            "mysql:mysql-connector-java:8.0.11",
+            //Драйвера для Postgres:
+            "org.postgresql:postgresql:42.2.2"
     )
-
-    compile 'me.tongfei:progressbar:0.6.0'
-    compile 'com.google.guava:guava:24.1-jre'
 
 //    http://www.querydsl.com
 //    compile("com.querydsl:querydsl-jpa:${queryDSL}",
@@ -79,34 +93,29 @@ dependencies {
 //            "com.querydsl:querydsl-apt:${queryDSL}",
 //            "com.querydsl:querydsl-core:${queryDSL}")
 
-//  compile('org.springframework.boot:spring-boot-starter-web')
-//	compile('org.springframework.boot:spring-boot-starter-security')
-//	compile('org.springframework.boot:spring-boot-starter-cache')
-//	compile('org.springframework.session:spring-session-core')
-//	compile('org.springframework.boot:spring-boot-starter-webflux')
-//  compile('org.springframework.boot:spring-boot-starter-actuator')
-//  compile('org.springframework.boot:spring-boot-starter-data-rest')
+    compileOnly("org.springframework.boot:spring-boot-configuration-processor")
+    runtime("org.springframework.boot:spring-boot-devtools")
 
-    // SimpleFlatMapper - работа с CSV
-//    compile 'org.simpleflatmapper:sfm-csv:3.16.0'
-
-    compileOnly('org.springframework.boot:spring-boot-configuration-processor')
-    runtime('org.springframework.boot:spring-boot-devtools')
-
-    testCompile(
-            "org.springframework.boot:spring-boot-starter-test",
+    testCompile("org.springframework.boot:spring-boot-starter-test",
+            "io.github.glytching:junit-extensions:2.1.0",
+            "com.github.sbrannen:spring-test-junit5:1.0.3",
+            "junit:junit:${JUNIT_VERSION}",
             "org.assertj:assertj-core:${assertJVersion}",
+            "name.falgout.jeffrey.testing.junit5:mockito-extension:1.0.1",
+            "org.jetbrains.spek:spek-junit-platform-engine:1.1.5",
+            // Needed for @RunWith(JUnitPlatform.class) in the IDE
+            "org.junit.platform:junit-platform-runner:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-console:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-console-standalone:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-suite-api:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-commons:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-engine:${junitPlatformVersion}",
+            "org.junit.platform:junit-platform-surefire-provider:${junitPlatformVersion}",
             "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}",
             "org.junit.jupiter:junit-jupiter-migrationsupport:${junitJupiterVersion}",
-            "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}",
-            "org.junit.platform:junit-platform-runner:${junitPlatformVersion}",
-            "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}",
-            "org.junit.vintage:junit-vintage-engine:${junitVintageVersion}",
-            'name.falgout.jeffrey.testing.junit5:mockito-extension:1.0.0'
     )
-//	testCompile('io.projectreactor:reactor-test')
-//	testCompile('org.springframework.security:spring-security-test')
-
-    testRuntime group: 'junit', name: 'junit', version: '4.12'
-    testRuntime group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
+    testRuntime(
+            "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}",
+            "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}",
+            "org.junit.platform:junit-platform-launcher:${junitPlatformVersion}")
 }
