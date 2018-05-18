@@ -8,10 +8,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = {"ru.steklopod.repositories.maria"})
 @EnableTransactionManagement
-public class RebaseUsers {
+public class App {
 
     public static void main(String[] args) {
-        SpringApplication.run(RebaseUsers.class, args);
+        SpringApplication.run(App.class, args);
     }
 
 }

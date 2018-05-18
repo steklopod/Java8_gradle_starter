@@ -1,6 +1,4 @@
 
-csv.filename: "clients.csv"
-
 mariadb:
   datasource:
     driverClassName: org.mariadb.jdbc.Driver
@@ -11,14 +9,14 @@ mariadb:
 sql-server:
   datasource:
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    jdbc-url: "jdbc:sqlserver://10.60.170.11:1433;database=steklopod"
-    username: root
-    password: root
+    jdbc-url: "jdbc:sqlserver://10.60.170.11:1433;database=StolotoSB"
+    username: "stoloto_ro"
+    password: "3Dq3--uVQtM-d-xS"
 
 spring:
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: create
       use-new-id-generator-mappings: true
   profiles:
     active: steklopod

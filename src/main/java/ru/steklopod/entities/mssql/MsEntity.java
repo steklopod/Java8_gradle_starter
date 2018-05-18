@@ -9,20 +9,17 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity
 @Data
-@Table(name = "Region")
-@NoArgsConstructor
+@Entity
+@Table(name = "MsEntity")
 @AllArgsConstructor
-public class Region {
+@NoArgsConstructor
+public class MsEntity {
 
     @Id
-    @Column(name = "Id")
+    @Column(name = "ClientId")
     private Integer id;
 
-    private String alpha3Code;
-
-    private String alpha2Code;
-
-
+    @Column(name = "Source")
+    private Integer source;
 }

@@ -43,9 +43,9 @@ public class MariaDbConfig {
         lef.setPackagesToScan("ru.steklopod.entities.mariadb");
         Properties properties = new Properties();
 //        properties.setProperty("hibernate.format_sql", "true");
+//        properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
         properties.setProperty("hibernate.connection.shutdown", "true");
-//        properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
         properties.setProperty("hibernate.proc.param_null_passing", "true");
         properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);
         lef.setJpaProperties(properties);
