@@ -2,6 +2,7 @@ package ru.steklopod;
 
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import name.falgout.jeffrey.testing.junit.mockito.MockitoExtension;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.steklopod.entities.User;
 import ru.steklopod.repositories.UserDao;
 
+import java.util.ArrayList;
 import java.util.stream.IntStream;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
@@ -44,6 +46,14 @@ class InitTest {
         User user = random(User.class);
         userDao.saveAndFlush(user);
         System.err.println("OK. Сохранено успешно.");
+    }
+
+    @Test
+    void lombok() {
+        val example = new ArrayList<Integer>();
+        val integer = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM user", Integer.class);
+        example.add(integer);
+        System.err.println(example);
     }
 
 

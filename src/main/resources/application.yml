@@ -2,14 +2,14 @@
 postgres:
   datasource:
     driverClassName: org.mariadb.jdbc.Driver
-    jdbc-url: "jdbc:mariadb://localhost:3306/ifd_test"
+    jdbc-url: "jdbc:mariadb://localhost:3306/test"
     password: root
     username: root
 
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       use-new-id-generator-mappings: true
     show-sql: false
   profiles:
