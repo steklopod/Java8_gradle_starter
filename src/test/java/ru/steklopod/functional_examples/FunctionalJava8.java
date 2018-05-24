@@ -43,7 +43,6 @@ class FunctionalJava8 {
         //Функциональный интерфейс Function<T,R> представляет функцию перехода от объекта типа T к объекту типа R:
     void function() {
         Function<Integer, String> convert = x -> String.valueOf(x) + " долларов";
-
         System.out.println(convert.apply(5)); // 5 долларов
     }
 
