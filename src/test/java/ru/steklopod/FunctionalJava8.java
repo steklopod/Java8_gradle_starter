@@ -18,8 +18,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -30,14 +35,6 @@ import java.util.stream.Stream;
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
 @Transactional
 class FunctionalJava8 {
-
-    @Test
-    void binary() {
-        BinaryOperator<Integer> multiply = (x, y) -> x * y;
-
-        System.out.println(multiply.apply(3, 5)); // 15
-        System.out.println(multiply.apply(10, -2)); // -20
-    }
 
     @Test
     void unary() {
@@ -64,7 +61,7 @@ class FunctionalJava8 {
 
     @Test
     @Disabled
-    //Supplier<T> не принимает никаких аргументов, но должен возвращать объект типа T:
+        //Supplier<T> не принимает никаких аргументов, но должен возвращать объект типа T:
     void supplier() {
         Supplier<User> userFactory = () -> {
 
@@ -91,6 +88,16 @@ class FunctionalJava8 {
                 .filter(pattern.asPredicate())
                 .count();
         System.err.println(count);
+    }
+
+    @Test
+    void поискДлиннойСтроки() {
+        List<String> strings = Arrays.asList("aaa", "bbb", "ccc", "ddd", "ffff");
+
+        String s = strings.stream()
+                .reduce("", (left, right) -> left.length() > right.length() ? left : right);
+
+        System.out.println(s); //output ffff
     }
 
     @Test
