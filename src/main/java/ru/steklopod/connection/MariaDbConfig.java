@@ -26,11 +26,13 @@ public class MariaDbConfig {
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
 
+    private static String PACKAGES_TO_SCAN = "ru.steklopod.entities";
+
     private Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();
+        props.put("hibernate.hbm2ddl.auto", ddlAuto);
         props.put("hibernate.connection.shutdown", "true");
         props.put("hibernate.proc.param_null_passing", "true");
-        props.put("hibernate.hbm2ddl.auto", ddlAuto);
         props.put("hibernate.classloading.use_current_tccl_as_parent", "false");
         return props;
     }
@@ -45,8 +47,8 @@ public class MariaDbConfig {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(EntityManagerFactoryBuilder builder) {
         return builder
                 .dataSource(dataSource())
-                .packages("ru.steklopod.entities")
-                .persistenceUnit("steklopod-entity")
+                .packages(PACKAGES_TO_SCAN)
+                .persistenceUnit("steklopod-maria_db")
                 .properties(jpaProperties())
                 .build();
     }
