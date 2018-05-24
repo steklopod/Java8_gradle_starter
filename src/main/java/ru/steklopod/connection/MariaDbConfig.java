@@ -24,7 +24,6 @@ import java.util.Properties;
 @EnableJpaRepositories(basePackages = "ru.steklopod.repositories")
 @EnableTransactionManagement
 public class MariaDbConfig {
-
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
 
@@ -40,11 +39,12 @@ public class MariaDbConfig {
             lef.setDataSource(dataSource());
             lef.setJpaVendorAdapter(jpaVendorAdapter());
             lef.setPackagesToScan("ru.steklopod.entities");
+
         Properties properties = new Properties();
             properties.setProperty("hibernate.connection.shutdown", "true");
-    //        properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
             properties.setProperty("hibernate.proc.param_null_passing", "true");
             properties.setProperty("hibernate.hbm2ddl.auto", ddlAuto);
+            //properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
         lef.setJpaProperties(properties);
         lef.afterPropertiesSet();
         return lef.getObject();
@@ -66,8 +66,8 @@ public class MariaDbConfig {
 
     @Bean
     @Autowired
-    public JdbcTemplate createJdbcTemplate_maria(@Qualifier("dataSource") DataSource profileServiceDS) {
-        return new JdbcTemplate(profileServiceDS);
+    public JdbcTemplate jdbcTemplate_maria(@Qualifier("dataSource") DataSource dataSource) {
+        return new JdbcTemplate(dataSource);
     }
 }
 

@@ -59,8 +59,7 @@ class RandomBeans {
     }
 
     @Test
-    void canInjectARandomListOfSpecificSize(
-            @Random(size = 5, type = String.class) List<String> anyListOfSpecificSize) {
+    void canInjectARandomListOfSpecificSize(@Random(size = 5, type = String.class) List<String> anyListOfSpecificSize) {
 
     }
 
@@ -75,8 +74,7 @@ class RandomBeans {
     }
 
     @Test
-    void canInjectARandomCollection(
-            @Random(type = String.class) Collection<String> anyCollection) {
+    void canInjectARandomCollection(@Random(type = String.class) Collection<String> anyCollection) {
 
     }
 

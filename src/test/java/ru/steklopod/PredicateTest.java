@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static ru.steklopod.PredicateTest.EmployeePredicates.filterEmployees;
 import static ru.steklopod.PredicateTest.EmployeePredicates.*;
 
 @Slf4j
@@ -58,9 +57,6 @@ class PredicateTest {
         }
 
 
-        static List<Employee> filterEmployees (List<Employee> employees, Predicate<Employee> predicate) {
-            return employees.stream().filter( predicate ).collect(Collectors.<Employee>toList());
-        }
     }
 
     @BeforeEach
@@ -76,10 +72,15 @@ class PredicateTest {
         Employee e9 = new Employee(9, 15, "F", "Neetu", "Singh");
         Employee e10 = new Employee(10, 45, "M", "Naveen", "Jain");
 
-       employees = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10));
+        employees = new ArrayList<>(Arrays.asList(e1, e2, e3, e4, e5, e6, e7, e8, e9, e10));
     }
-
     private List<Employee> employees;
+
+    private List<Employee> filterEmployees(List<Employee> employees, Predicate<Employee> predicate) {
+        return employees.stream()
+                .filter(predicate)
+                .collect(Collectors.<Employee>toList());
+    }
 
     @Test
     void predicat() {
@@ -94,4 +95,12 @@ class PredicateTest {
         System.out.println(filterEmployees(employees, isAgeMoreThan(35).negate()));
     }
 
+
+    @Test
+    void anotherPredicat() {
+        Predicate<Integer> isPositive = x -> x > 0;
+
+        System.out.println(isPositive.test(5)); // true
+        System.out.println(isPositive.test(-7)); // false
+    }
 }
