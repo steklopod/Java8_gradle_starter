@@ -42,9 +42,9 @@ class FunctionInterface {
 
     @Test
     void functionAndThen() {
-        Function<Integer, Integer> f1 = i -> i*4;
+        Function<Integer, Integer> f1 = i -> i * 4;
 
-        Function<Integer, Integer> f2 = i -> i+4;
+        Function<Integer, Integer> f2 = i -> i + 4;
 
         System.out.println(f2.andThen(f1).apply(3)); // 28
 
@@ -55,4 +55,28 @@ class FunctionInterface {
         System.out.println(j2); //28
     }
 
+
+    @Test
+    void oneMore() {
+        //define a function directly
+        Function<Integer, Integer> add1 = a -> a + 1;
+
+        class m {
+            Integer addTen(Integer a) {
+                return a + 10;
+            }
+        }
+
+        //function via method reference
+        Function<Integer, Integer> add10 = new m()::addTen;
+
+        add1.apply(10);//11
+        add10.apply(10);//20
+
+        //function composition
+        Function<Integer, Integer> add5 = add1.andThen(add1)
+                .andThen(add1)
+                .andThen(add1)
+                .andThen(add1);
+    }
 }
