@@ -1,4 +1,4 @@
-package ru.steklopod;
+package ru.steklopod.other_examples;
 
 import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;

@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 class ReserveTest {
 
     @Test
-    void binary() {
+    void старт() {
 
     }
 

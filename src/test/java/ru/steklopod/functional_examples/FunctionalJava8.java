@@ -11,7 +11,6 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 import ru.steklopod.entities.User;
 
 import java.io.IOException;
@@ -24,13 +23,13 @@ import java.util.Scanner;
 import java.util.function.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Slf4j
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
-@Transactional
 class FunctionalJava8 {
 
     @Test
@@ -88,7 +87,6 @@ class FunctionalJava8 {
     @SneakyThrows
     void pattern() {
         Pattern pattern = Pattern.compile(".*@gmail\\.com");
-
         long count = Stream.of("bob@gmail.com", "alice@hotmail.com")
                 .filter(pattern.asPredicate())
                 .count();
@@ -116,4 +114,31 @@ class FunctionalJava8 {
             System.err.println("Файлы: " + joined);
         }
     }
+
+
+    @Test
+    void intStream() {
+        IntStream.iterate(0, i -> i + 2).limit(3);    // > 0, 2, 4
+
+        IntStream.range(1, 5).map(i -> i * i);            // > 1, 4, 9, 16
+
+        IntStream.range(1, 5).anyMatch(i -> i % 2 == 0);  // > true
+
+        IntStream.range(1, 5).allMatch(i -> i % 2 == 0);  // > false
+        IntStream.range(1, 5).noneMatch(i -> i % 2 == 0); // > false
+
+        IntStream.range(1, 5)
+                .filter(i -> i % 2 == 0)
+                .allMatch(i -> i % 2 == 0);               // > true
+        IntStream.range(1, 5)
+                .filter(i -> i % 2 == 0)
+                .noneMatch(i -> i % 2 != 0);              // > true
+
+        IntStream.range(1, 5).max().getAsInt();           // > 4
+
+        IntStream.range(1, 5)
+                .reduce(1, (x, y) -> x * y);       // > 24
+    }
+
+
 }

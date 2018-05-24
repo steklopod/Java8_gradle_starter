@@ -1,23 +1,18 @@
-package ru.steklopod;
+package ru.steklopod.other_examples;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import static org.apache.commons.lang3.StringUtils.*;
-import static org.apache.commons.lang3.StringUtils.countMatches;
 import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ExtendWith(SpringExtension.class)
-@Transactional
 class StringUtils {
 
     //http://www.baeldung.com/string-processing-commons-lang

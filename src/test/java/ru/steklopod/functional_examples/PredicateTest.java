@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
-@Transactional
 class PredicateTest {
     @Data
     @AllArgsConstructor
