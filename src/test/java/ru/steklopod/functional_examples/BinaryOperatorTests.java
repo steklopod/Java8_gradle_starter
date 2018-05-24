@@ -1,4 +1,4 @@
-package ru.steklopod;
+package ru.steklopod.functional_examples;
 
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import lombok.AllArgsConstructor;

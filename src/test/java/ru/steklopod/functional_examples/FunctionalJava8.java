@@ -1,4 +1,4 @@
-package ru.steklopod;
+package ru.steklopod.functional_examples;
 
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import lombok.SneakyThrows;
@@ -21,10 +21,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -76,6 +73,14 @@ class FunctionalJava8 {
 
         System.out.println("Имя user1: " + user1.getName());
         System.out.println("Имя user2: " + user2.getName());
+    }
+
+    @Test
+    void anotherPredicat() {
+        Predicate<Integer> isPositive = x -> x > 0;
+
+        System.out.println(isPositive.test(5)); // true
+        System.out.println(isPositive.test(-7)); // false
     }
 
 
