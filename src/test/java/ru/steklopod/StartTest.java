@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RunWith(JUnitPlatform.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
 @Transactional
-class ReserveTest {
+class StartTest {
 
     @Test
     void старт() {
