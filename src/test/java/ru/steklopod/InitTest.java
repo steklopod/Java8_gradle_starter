@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import name.falgout.jeffrey.testing.junit.mockito.MockitoExtension;
 import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,7 +40,7 @@ class InitTest {
     @Test
     @DisplayName("MariaDb: сохранение ")
     @Rollback(false)
-    @Disabled
+//    @Disabled
     void savePerson() {
         User user = random(User.class);
         userDao.saveAndFlush(user);
