@@ -26,7 +26,13 @@ public class MariaDbConfig {
     @Value("${spring.jpa.hibernate.ddl-auto}")
     private String ddlAuto;
 
-    private static String PACKAGES_TO_SCAN = "ru.steklopod.entities";
+    private static final String PACKAGES_TO_SCAN = "ru.steklopod.entities";
+
+    @ConfigurationProperties(prefix = "maria.datasource")
+    @Bean
+    public DataSource dataSource() {
+        return DataSourceBuilder.create().build();
+    }
 
     private Map<String, Object> jpaProperties() {
         Map<String, Object> props = new HashMap<>();
@@ -35,12 +41,6 @@ public class MariaDbConfig {
         props.put("hibernate.proc.param_null_passing", "true");
         props.put("hibernate.classloading.use_current_tccl_as_parent", "false");
         return props;
-    }
-
-    @ConfigurationProperties(prefix = "postgres.datasource")
-    @Bean
-    public DataSource dataSource() {
-        return DataSourceBuilder.create().build();
     }
 
     @Bean

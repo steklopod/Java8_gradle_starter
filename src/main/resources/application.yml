@@ -1,5 +1,5 @@
 
-postgres:
+maria:
   datasource:
     jdbc-url: "jdbc:mariadb://localhost:3306/test"
     password: root
