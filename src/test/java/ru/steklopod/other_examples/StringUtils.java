@@ -1,11 +1,17 @@
 package ru.steklopod.other_examples;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -40,6 +46,27 @@ class StringUtils {
         String reversedString = reverseDelimited(originalString, '.');
 
         assertEquals("com.baeldung.www", reversedString);
+    }
+
+    @Test
+    void поискДлиннойСтроки() {
+        List<String> strings = Arrays.asList("aaa", "bbb", "ccc", "ddd", "ffff");
+
+        String s = strings.stream()
+                .reduce("", (left, right) -> left.length() > right.length() ? left : right);
+
+        System.out.println(s); //output ffff
+    }
+
+
+    @Test
+    @SneakyThrows
+    void pattern() {
+        Pattern pattern = Pattern.compile(".*@gmail\\.com");
+        long count = Stream.of("bob@gmail.com", "alice@hotmail.com")
+                .filter(pattern.asPredicate())
+                .count();
+        System.err.println(count);
     }
 
 }

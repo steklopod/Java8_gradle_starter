@@ -24,6 +24,18 @@ import java.util.stream.Collectors;
 @RunWith(JUnitPlatform.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
 class PredicateTest {
+
+    @Test
+    void простой_предикат() {
+        Predicate<Integer> isPositive = x -> x > 0;
+
+        System.out.println(isPositive.test(5)); // true
+        System.out.println(isPositive.test(-7)); // false
+    }
+
+    /**
+     *
+     */
     @Data
     @AllArgsConstructor
     private class Employee {

@@ -1,10 +1,7 @@
 package ru.steklopod.functional_examples;
 
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import name.falgout.jeffrey.testing.junit.mockito.MockitoExtension;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -17,24 +14,24 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
-import java.util.function.*;
-import java.util.regex.Pattern;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static io.github.benas.randombeans.api.EnhancedRandom.random;
+
 @Slf4j
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
-@ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
+@ExtendWith({SpringExtension.class, RandomBeansExtension.class})
 class FunctionalJava8 {
 
     @Test
-        // Возвращает тот же тип, что и принимает:
-    void unary() {
+        // Возвращает и принимает один и тот же тип <T>:
+    void UNARY() {
         UnaryOperator<Integer> square = x -> x * x;
 
         System.out.println(square.apply(5)); // 25
@@ -50,34 +47,21 @@ class FunctionalJava8 {
         );// Stream is now ["A", "B"]
     }
 
-    @Test
-        // Функция перехода от объекта типа T к объекту типа R:
-    void function() {
-        Function<Integer, String> convert = x -> String.valueOf(x) + " долларов";
-
-        System.out.println(convert.apply(5)); // 5 долларов
-    }
 
     @Test
-        //Consumer<T> выполняет некоторое действие над объектом типа T, при этом ничего не возвращая:
-    void consumer() {
+        //Принимает <T>, но ничего не возвращает:
+    void CONSUMER() {
         Consumer<Integer> printer = x -> System.out.printf("%d долларов \n", x);
 
         printer.accept(600); // 600 долларов
     }
 
-    @Test
-    @Disabled
-        //TODO - поменять
-        //Supplier<T> не принимает никаких аргументов, но должен возвращать объект типа T:
-    void supplier() {
-        Supplier<User> userFactory = () -> {
 
-            Scanner in = new Scanner(System.in);
-            System.out.println("Введите имя: ");
-            String name = in.nextLine();
-            return new User(name);
-        };
+
+    @Test
+        //Не принимает аргументов, но должен возвращать объект типа <T>:
+    void SUPPLIER() {
+        Supplier<User> userFactory = () -> random(User.class);
 
         User user1 = userFactory.get();
         User user2 = userFactory.get();
@@ -90,37 +74,6 @@ class FunctionalJava8 {
     /**
      * Всячина:
      */
-
-    @Test
-    void anotherPredicat() {
-        Predicate<Integer> isPositive = x -> x > 0;
-
-        System.out.println(isPositive.test(5)); // true
-        System.out.println(isPositive.test(-7)); // false
-    }
-
-
-    @Test
-    @SneakyThrows
-    void pattern() {
-        Pattern pattern = Pattern.compile(".*@gmail\\.com");
-        long count = Stream.of("bob@gmail.com", "alice@hotmail.com")
-                .filter(pattern.asPredicate())
-                .count();
-        System.err.println(count);
-    }
-
-
-    @Test
-    void поискДлиннойСтроки() {
-        List<String> strings = Arrays.asList("aaa", "bbb", "ccc", "ddd", "ffff");
-
-        String s = strings.stream()
-                .reduce("", (left, right) -> left.length() > right.length() ? left : right);
-
-        System.out.println(s); //output ffff
-    }
-
     @Test
     void file() throws IOException {
         try (Stream<Path> stream = Files.list(Paths.get(""))) {
@@ -132,7 +85,6 @@ class FunctionalJava8 {
             System.err.println("Файлы: " + joined);
         }
     }
-
 
     @Test
     void intStream() {

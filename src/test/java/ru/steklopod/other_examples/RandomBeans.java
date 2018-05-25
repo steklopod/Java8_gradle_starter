@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 @ExtendWith(RandomBeansExtension.class)
+//https://github.com/benas/random-beans
 class RandomBeans {
 
     @Random

@@ -30,9 +30,18 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @RunWith(JUnitPlatform.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
 class BinaryOperatorTests {
+    @Test
+    void binaryString() {
+        BinaryOperator<String> concat = (a, b) -> a + b;
+        assertEquals(
+                concat.apply(concat.apply("hello", "world"), "c"),// "helloworldc"
+
+                concat.apply("hello", concat.apply("world", "c"))// "helloworldc"
+        );
+    }
 
     @Test
-    void binary() {
+    void binaryInt() {
         BinaryOperator<Integer> multiply = (x, y) -> x * y;
 
         System.out.println(multiply.apply(3, 5));   // 15
@@ -55,6 +64,7 @@ class BinaryOperatorTests {
 
         assertFalse(listA.isEmpty());
     }
+
 
     @Test
     void binarySearch() {
@@ -93,18 +103,6 @@ class BinaryOperatorTests {
     }
 
 
-    @Test
-    void binaryString() {
-        BinaryOperator<String> concat = (a, b) -> a + b;
-
-        String helloworldc =
-                concat.apply(concat.apply("hello", "world"), "c");// "helloworldc"  //System.err.println(helloworldc);
-
-        String helloworldc2 =
-                concat.apply("hello", concat.apply("world", "c"));// "helloworldc"  //System.err.println(helloworldc2);
-
-        assertEquals(helloworldc, helloworldc2);
-    }
 
 
     @Test
