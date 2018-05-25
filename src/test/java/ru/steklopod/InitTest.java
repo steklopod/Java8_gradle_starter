@@ -20,12 +20,14 @@ import ru.steklopod.entities.User;
 import ru.steklopod.repositories.UserDao;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
 import static ru.steklopod.entities.User.TABLE_NAME;
+import static ru.steklopod.entities.User.USER_ID_COLUMN_NAME;
 
 @Slf4j
 @SpringBootTest
@@ -50,7 +52,6 @@ class InitTest {
     @Test
     void daoTest() {
         System.err.println(userDao.selectUserNativeQueryLimitOne(2));
-
         System.err.println(userDao.selectCountOfUsers());
     }
 
@@ -62,6 +63,11 @@ class InitTest {
         System.err.println(example);
     }
 
+    @FunctionalInterface
+    interface UserParserName {
+        String parse(User user);
+    }
+
     @Random
     private String anyString;
 
@@ -71,22 +77,33 @@ class InitTest {
         User user = userDao.findAll().stream().findAny().get();
         System.err.println(user);
 
-        Function<User, String> newName = User::getName;
+        Function<User, String> getName = User::getName;
         UnaryOperator<String> upperName = String::toUpperCase;
         UnaryOperator<String> randomStringPlusUpperName = s -> anyString.substring(0, 5) + s;
         Consumer<String> updateName = name -> jdbcTemplate.update(String.format("UPDATE %s SET name = ? ", TABLE_NAME), name);
 
-        Function<User, Void> userVFunction = newName
+        Function<User, Void> userVFunction = getName
                 .andThen(upperName)
                 .andThen(randomStringPlusUpperName)
                 .andThen(name -> {
                     updateName.accept(name);
                     return null;
                 });
-
         userVFunction.apply(user);
+
     }
 
+    @Test
+    @Rollback(false)
+    void consumerUpdateDate() {
+        Consumer<User> updateNameForAll = (User u) -> jdbcTemplate.update(
+                String.format("UPDATE %s SET name = ? where %s = ?", TABLE_NAME, USER_ID_COLUMN_NAME)
+                , (u.getName() + " updated"), u.getId());
+
+        List<User> allUsers = userDao.findAll();
+
+        allUsers.forEach(updateNameForAll);
+    }
 
 }
 
