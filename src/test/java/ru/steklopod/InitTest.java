@@ -39,10 +39,11 @@ class InitTest {
     private UserDao userDao;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    @Random
+    private String anyString;
 
     @RepeatedTest(5)
     @Rollback(false)
-//    @Disabled
     void savePerson() {
         User user = random(User.class);
         userDao.saveAndFlush(user);
@@ -63,14 +64,6 @@ class InitTest {
         System.err.println(example);
     }
 
-    @FunctionalInterface
-    interface UserParserName {
-        String parse(User user);
-    }
-
-    @Random
-    private String anyString;
-
     @Test
     @Rollback(false)
     void functionChain() {
@@ -90,7 +83,6 @@ class InitTest {
                     return null;
                 });
         userVFunction.apply(user);
-
     }
 
     @Test
