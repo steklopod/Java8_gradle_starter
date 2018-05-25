@@ -1,4 +1,4 @@
-package ru.steklopod.functional_examples;
+package ru.steklopod.functional_examples.interfaces;
 
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import lombok.extern.slf4j.Slf4j;
@@ -22,16 +22,16 @@ import static io.github.benas.randombeans.api.EnhancedRandom.random;
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ExtendWith({SpringExtension.class, RandomBeansExtension.class})
-class FunctionalJava8 {
+class Interfaces {
 
     @Test
         //Function<T,R> - переход от объекта типа T к объекту типа R:
     void FUNCTION() {
-        Function<Integer, String> convert = x -> String.valueOf(x) + " долларов";
+        Function<Integer, Double> celsiyToFahrenheitInt = x -> new Double((x * 9 / 5) + 32);
+        Function<String, Integer> stringToInt = Integer::valueOf;
 
-        System.out.println(
-                convert.apply(5)
-        ); // 5 долларов
+        System.out.println("Centigrade to Fahrenheit: " + celsiyToFahrenheitInt.apply(36));
+        System.out.println(" String to Int: " + stringToInt.apply("4"));
     }
 
     @Test
