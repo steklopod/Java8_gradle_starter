@@ -10,14 +10,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.steklopod.entities.User;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -74,17 +69,6 @@ class FunctionalJava8 {
     /**
      * Всячина:
      */
-    @Test
-    void file() throws IOException {
-        try (Stream<Path> stream = Files.list(Paths.get(""))) {
-            String joined = stream
-                    .map(String::valueOf)
-                    .filter(path -> !path.startsWith("."))
-                    .sorted()
-                    .collect(Collectors.joining("; "));
-            System.err.println("Файлы: " + joined);
-        }
-    }
 
     @Test
     void intStream() {

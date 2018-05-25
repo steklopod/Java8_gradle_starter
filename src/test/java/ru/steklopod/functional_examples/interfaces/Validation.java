@@ -4,7 +4,6 @@ import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.platform.runner.JUnitPlatform;
@@ -25,8 +24,8 @@ import static ru.steklopod.functional_examples.interfaces.Validation.ValidationR
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ExtendWith({SpringExtension.class, RandomBeansExtension.class})
-@DisplayName("Ничего не возвращает")
 class Validation {
+// Сложный для поеимания пример
 
     @Data
     @AllArgsConstructor
@@ -119,8 +118,6 @@ class Validation {
         ValidationResult result = validation.apply(gregor);
         result.getReason().ifPresent(System.out::println); // Name is empty.
     }
-
-
 
 
 
