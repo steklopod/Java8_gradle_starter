@@ -17,14 +17,7 @@ import java.util.function.Function;
 @RunWith(JUnitPlatform.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
 class Functions {
-
-    @Test
-        //Function<T,R> - переход от объекта типа T к объекту типа R:
-    void function() {
-        Function<Integer, String> convert = x -> String.valueOf(x) + " долларов";
-        System.out.println(convert.apply(5)); // 5 долларов
-    }
-
+    //Function<T,R> - переход от объекта типа T к объекту типа R:
 
     @Test
     void цельсий_в_фаренгейт() {

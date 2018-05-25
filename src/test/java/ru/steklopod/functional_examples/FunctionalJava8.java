@@ -11,9 +11,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import ru.steklopod.entities.User;
 
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
@@ -25,11 +25,23 @@ import static io.github.benas.randombeans.api.EnhancedRandom.random;
 class FunctionalJava8 {
 
     @Test
+        //Function<T,R> - переход от объекта типа T к объекту типа R:
+    void FUNCTION() {
+        Function<Integer, String> convert = x -> String.valueOf(x) + " долларов";
+
+        System.out.println(
+                convert.apply(5)
+        ); // 5 долларов
+    }
+
+    @Test
         // Возвращает и принимает один и тот же тип <T>:
     void UNARY() {
         UnaryOperator<Integer> square = x -> x * x;
 
-        System.out.println(square.apply(5)); // 25
+        System.out.println(
+                square.apply(5)
+        ); // 25
 
         UnaryOperator<String> trimFunction = String::trim;
         UnaryOperator<String> toUpperCaseFunction = String::toUpperCase;
@@ -63,35 +75,6 @@ class FunctionalJava8 {
 
         System.out.println("Имя user1: " + user1.getName());
         System.out.println("Имя user2: " + user2.getName());
-    }
-
-
-    /**
-     * Всячина:
-     */
-
-    @Test
-    void intStream() {
-        IntStream.iterate(0, i -> i + 2).limit(3);    // > 0, 2, 4
-
-        IntStream.range(1, 5).map(i -> i * i);            // > 1, 4, 9, 16
-
-        IntStream.range(1, 5).anyMatch(i -> i % 2 == 0);  // > true
-
-        IntStream.range(1, 5).allMatch(i -> i % 2 == 0);  // > false
-        IntStream.range(1, 5).noneMatch(i -> i % 2 == 0); // > false
-
-        IntStream.range(1, 5)
-                .filter(i -> i % 2 == 0)
-                .allMatch(i -> i % 2 == 0);               // > true
-        IntStream.range(1, 5)
-                .filter(i -> i % 2 == 0)
-                .noneMatch(i -> i % 2 != 0);              // > true
-
-        IntStream.range(1, 5).max().getAsInt();           // > 4
-
-        IntStream.range(1, 5)
-                .reduce(1, (x, y) -> x * y);       // > 24
     }
 
 
