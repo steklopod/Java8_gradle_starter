@@ -24,4 +24,7 @@ public interface UserDao extends JpaRepository<User, Integer> {
     @Query(value = SELECT_1_USER, nativeQuery = true)
     Optional<User> selectUserNativeQueryLimitOne(@Param("id") Integer id);
 
+
+
+
 }

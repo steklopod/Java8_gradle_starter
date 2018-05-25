@@ -13,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
@@ -21,26 +22,41 @@ import java.util.function.UnaryOperator;
 @RunWith(JUnitPlatform.class)
 @ExtendWith({SpringExtension.class, RandomBeansExtension.class})
 class AndThen {
+
     @Test
+        //Function<T,R> - переход от объекта типа T к объекту типа R:
     void functionAndThen() {
         Function<Integer, Integer> f1 = i -> i * 4;
         Function<Integer, Integer> f2 = i -> i + 4;
 
         f2.andThen(f1).apply(3); // 28
 
-        //f2.andThen(f1).apply(3) - is equals to below statements
+        //f2.andThen(f1).apply(3) - то же самое:
         Integer j1 = f2.apply(3);
-        Integer j2 = f1.apply(j1);
-
-        System.out.println(j2); //28
+        Integer j2 = f1.apply(j1); //28
     }
+
     @Test
     void самый_простой() {
         Function<Integer, String> converter = (i) -> Integer.toString(i);
-        System.out.println(converter.apply(3).length());
+        System.out.println(
+                converter.apply(3).length()
+        );
 
         Function<String, Integer> reverse = (s) -> Integer.parseInt(s);
-        System.out.println(converter.andThen(reverse).apply(30).byteValue());
+        System.out.println(
+                converter.andThen(reverse).apply(30).byteValue()
+        );
+    }
+
+    @Test
+    void самый_простой_2_BiFunction() {
+        BinaryOperator<Integer> operator = (a, b) -> a + b;
+        Function<Integer, Integer> function = n -> n * 2;
+
+        System.out.println(
+                operator.andThen(function).apply(1, 6) //14
+        );
     }
 
     @Test
@@ -64,9 +80,8 @@ class AndThen {
                 .andThen(add1);
     }
 
-    /**
-     *
-     */
+
+
     @Test
     void consumerChain() {
         List<Student> students = Arrays.asList(
@@ -101,7 +116,6 @@ class AndThen {
 // 4 вариант:
 //        employees.forEach(fx);
     }
-
 
 
 }

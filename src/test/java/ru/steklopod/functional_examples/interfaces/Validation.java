@@ -116,6 +116,7 @@ class Validation {
         User gregor = new User("Gregor", 30, "nicemail@gmail.com");
 
         ValidationResult result = validation.apply(gregor);
+
         result.getReason().ifPresent(System.out::println); // Name is empty.
     }
 

@@ -1,5 +1,6 @@
 package ru.steklopod;
 
+import io.github.glytching.junit.extension.random.Random;
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -19,8 +20,12 @@ import ru.steklopod.entities.User;
 import ru.steklopod.repositories.UserDao;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static io.github.benas.randombeans.api.EnhancedRandom.random;
+import static ru.steklopod.entities.User.TABLE_NAME;
 
 @Slf4j
 @SpringBootTest
@@ -44,11 +49,10 @@ class InitTest {
 
     @Test
     void daoTest() {
-        System.err.println(  userDao.selectUserNativeQueryLimitOne(2)  );
+        System.err.println(userDao.selectUserNativeQueryLimitOne(2));
 
-        System.err.println(  userDao.selectCountOfUsers()  );
+        System.err.println(userDao.selectCountOfUsers());
     }
-
 
     @Test
     void jdbcTemplateTest() {
@@ -58,6 +62,33 @@ class InitTest {
         System.err.println(example);
     }
 
+    @Random
+    private String anyString;
+
+    @Test
+    @Rollback(false)
+    void functionChain() {
+        User user = userDao.findAll().stream().findAny().get();
+        System.err.println(user);
+
+        Function<User, String> newName = User::getName;
+        UnaryOperator<String> upperName = String::toUpperCase;
+        UnaryOperator<String> randomStringPlusUpperName = s -> anyString.substring(0, 5) + s;
+        Consumer<String> updateName = name -> jdbcTemplate.update(String.format("UPDATE %s SET name = ? ", TABLE_NAME), name);
+
+        Function<User, Void> userVFunction = newName
+                .andThen(upperName)
+                .andThen(randomStringPlusUpperName)
+                .andThen(name -> {
+                    updateName.accept(name);
+                    return null;
+                });
+
+        userVFunction.apply(user);
+    }
 
 
 }
+
+
+

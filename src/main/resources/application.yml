@@ -8,7 +8,7 @@ maria:
 spring:
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
       use-new-id-generator-mappings: true
     show-sql: false
   profiles:
