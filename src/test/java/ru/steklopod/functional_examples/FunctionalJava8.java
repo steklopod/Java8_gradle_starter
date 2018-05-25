@@ -33,16 +33,28 @@ import java.util.stream.Stream;
 class FunctionalJava8 {
 
     @Test
+        // Возвращает тот же тип, что и принимает:
     void unary() {
         UnaryOperator<Integer> square = x -> x * x;
 
         System.out.println(square.apply(5)); // 25
+
+        UnaryOperator<String> trimFunction = String::trim;
+        UnaryOperator<String> toUpperCaseFunction = String::toUpperCase;
+
+        System.err.println(
+                Stream.of(" a ", " b ")
+                        .map(
+                                trimFunction.andThen(toUpperCaseFunction)
+                        )
+        );// Stream is now ["A", "B"]
     }
 
     @Test
-        //Функциональный интерфейс Function<T,R> представляет функцию перехода от объекта типа T к объекту типа R:
+        // Функция перехода от объекта типа T к объекту типа R:
     void function() {
         Function<Integer, String> convert = x -> String.valueOf(x) + " долларов";
+
         System.out.println(convert.apply(5)); // 5 долларов
     }
 
@@ -56,6 +68,7 @@ class FunctionalJava8 {
 
     @Test
     @Disabled
+        //TODO - поменять
         //Supplier<T> не принимает никаких аргументов, но должен возвращать объект типа T:
     void supplier() {
         Supplier<User> userFactory = () -> {
@@ -72,6 +85,11 @@ class FunctionalJava8 {
         System.out.println("Имя user1: " + user1.getName());
         System.out.println("Имя user2: " + user2.getName());
     }
+
+
+    /**
+     * Всячина:
+     */
 
     @Test
     void anotherPredicat() {
@@ -91,6 +109,7 @@ class FunctionalJava8 {
                 .count();
         System.err.println(count);
     }
+
 
     @Test
     void поискДлиннойСтроки() {

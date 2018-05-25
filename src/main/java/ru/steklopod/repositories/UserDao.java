@@ -16,7 +16,7 @@ import static ru.steklopod.entities.User.USER_ID_COLUMN_NAME;
 @Transactional("transactionManager")
 public interface UserDao extends JpaRepository<User, Integer> {
 
-    String SELECT_1_USER = "SELECT * FROM " + TABLE_NAME + " WHERE " + USER_ID_COLUMN_NAME + " > ?1 limit 1";
+   String SELECT_1_USER = "SELECT * FROM " + TABLE_NAME + " WHERE " + USER_ID_COLUMN_NAME + " > ?1 limit 1";
 
     @Query("SELECT COUNT(u) FROM User u")
     Long selectCountOfUsers();

@@ -12,7 +12,6 @@ import org.junit.platform.runner.JUnitPlatform;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -77,7 +76,7 @@ class PredicateTest {
     private List<Employee> filterEmployees(List<Employee> employees, Predicate<Employee> predicate) {
         return employees.stream()
                 .filter(predicate)
-                .collect(Collectors.<Employee>toList());
+                .collect(Collectors.toList());
     }
 
     @Test

@@ -16,7 +16,7 @@ import java.util.function.Function;
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
-class FunctionInterface {
+class Functions {
 
     @Test
         //Функциональный интерфейс Function<T,R> представляет функцию перехода от объекта типа T к объекту типа R:
@@ -78,5 +78,24 @@ class FunctionInterface {
                 .andThen(add1)
                 .andThen(add1)
                 .andThen(add1);
+    }
+
+    @Test
+    void another() {
+        // convert centigrade to fahrenheit
+        Function<Integer, Double> centigradeToFahrenheitInt = x -> new Double((x * 9 / 5) + 32);
+
+        // String to an integer
+        Function<String, Integer> stringToInt = Integer::valueOf;
+
+        // tests
+        Integer centigrade = 36;
+        System.out.println("Centigrade to Fahrenheit: " + centigradeToFahrenheitInt.apply(centigrade));
+        System.out.println(" String to Int: " + stringToInt.apply("4"));
+    }
+
+    @Test
+    void calcu() {
+
     }
 }
