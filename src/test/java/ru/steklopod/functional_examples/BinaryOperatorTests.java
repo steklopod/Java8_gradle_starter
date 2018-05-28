@@ -14,10 +14,7 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.BinaryOperator;
 import java.util.function.IntBinaryOperator;
@@ -33,12 +30,25 @@ class BinaryOperatorTests {
     @Test
     void binaryString() {
         BinaryOperator<String> concat = (a, b) -> a + b;
+
         assertEquals(
                 concat.apply(concat.apply("hello", "world"), "c"),// "helloworldc"
 
                 concat.apply("hello", concat.apply("world", "c"))// "helloworldc"
         );
     }
+
+    @Test
+    void binaryNew() {
+        // Using a method reference
+        BiFunction<String, String, Locale> f = Locale::new;
+        Locale loc = f.apply("en", "UK");
+
+        // Using a lambda expression
+        BiFunction<String, String, Locale> f2 = (lang, country) -> new Locale(lang, country);
+        Locale loc2 = f2.apply("en", "UK");
+    }
+
 
     @Test
     void binaryInt() {
@@ -101,8 +111,6 @@ class BinaryOperatorTests {
 
         System.out.println(list); //output [B, C, D]
     }
-
-
 
 
     @Test
