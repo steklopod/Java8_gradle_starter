@@ -28,9 +28,13 @@ class PredicateTest {
     @Test
     void простой_предикат() {
         Predicate<Integer> isPositive = x -> x > 0;
+        Predicate<Integer> isLessThan10 = x -> x > 0;
 
         System.out.println(isPositive.test(5)); // true
         System.out.println(isPositive.test(-7)); // false
+
+        // default methods - `and, or, negate`:
+        System.out.println(isPositive.and(isLessThan10).test(5)); // true
     }
 
     /**

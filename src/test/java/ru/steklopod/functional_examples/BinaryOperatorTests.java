@@ -39,7 +39,7 @@ class BinaryOperatorTests {
     }
 
     @Test
-    void binaryNew() {
+    void biFunction_New() {
         // Using a method reference
         BiFunction<String, String, Locale> f = Locale::new;
         Locale loc = f.apply("en", "UK");
