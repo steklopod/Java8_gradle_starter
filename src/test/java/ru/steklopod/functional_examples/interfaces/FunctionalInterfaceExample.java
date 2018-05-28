@@ -30,4 +30,32 @@ class FunctionalInterfaceExample {
     }
 
 
+    /**
+     *  Функция на 4 аргумента:
+     */
+    @FunctionalInterface
+    interface TriFunction<T, U, V, R> {
+        R apply(T t, U u, V v);
+    }
+
+    class Sum {
+        Integer doSum(String s1, String s2) {
+            return Integer.parseInt(s1) + Integer.parseInt(s1);
+        }
+    }
+
+    @Test
+    void doSum() {
+        TriFunction<Sum, String, String, Integer> anon = (s, arg1, arg2) -> s.doSum(arg1, arg1);
+
+        System.err.println(anon.apply(new Sum(), "1", "4"));
+    }
+
+    @Test
+    void doSum2() {
+        TriFunction<Sum, String, String, Integer> mRef = Sum::doSum;
+
+        System.err.println(mRef.apply(new Sum(), "1", "4"));
+    }
+
 }
