@@ -33,14 +33,14 @@ class FunctionalInterfaceExample {
     /**
      *  Функция на 4 аргумента:
      */
-    @FunctionalInterface
+    @FunctionalInterface               //Function<T,R> - переход от объекта типа T к объекту типа R:
     interface TriFunction<T, U, V, R> {
         R apply(T t, U u, V v);
     }
 
     class Sum {
         Integer doSum(String s1, String s2) {
-            return Integer.parseInt(s1) + Integer.parseInt(s1);
+            return Integer.parseInt(s1) + Integer.parseInt(s2);
         }
     }
 
@@ -52,7 +52,7 @@ class FunctionalInterfaceExample {
     }
 
     @Test
-    void doSum2() {
+    void doSum_короче() {
         TriFunction<Sum, String, String, Integer> mRef = Sum::doSum;
 
         System.err.println(mRef.apply(new Sum(), "1", "4"));
