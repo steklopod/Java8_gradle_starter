@@ -23,15 +23,14 @@ import java.util.function.UnaryOperator;
 @ExtendWith({SpringExtension.class, RandomBeansExtension.class})
 class AndThen {
 
-    @Test
-        //Function<T,R> - переход от объекта типа T к объекту типа R:
+    @Test                  //Function<T,R> - переход от объекта типа T к объекту типа R:
     void functionAndThen() {
         Function<Integer, Integer> f1 = i -> i * 4;
         Function<Integer, Integer> f2 = i -> i + 4;
 
         f2.andThen(f1).apply(3); // 28
 
-        //f2.andThen(f1).apply(3) - то же самое:
+        //то же самое:
         Integer j1 = f2.apply(3);
         Integer j2 = f1.apply(j1); //28
     }
@@ -42,10 +41,11 @@ class AndThen {
         System.out.println(
                 converter.apply(3).length()
         );
+        Function<String, Integer> reverse = Integer::parseInt;
 
-        Function<String, Integer> reverse = (s) -> Integer.parseInt(s);
         System.out.println(
-                converter.andThen(reverse).apply(30).byteValue()
+                converter
+                        .andThen(reverse).apply(30).byteValue()
         );
     }
 
@@ -55,7 +55,8 @@ class AndThen {
         Function<Integer, Integer> function = n -> n * 2;
 
         System.out.println(
-                operator.andThen(function).apply(1, 6) //14
+                operator
+                        .andThen(function).apply(1, 6) //14
         );
     }
 

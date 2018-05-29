@@ -13,7 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @SpringBootTest
 @RunWith(JUnitPlatform.class)
 @ExtendWith({SpringExtension.class, RandomBeansExtension.class})
-class FunctionalInterfaceExample {
+class FunctionalInterfaceAnnotation {
 
     @FunctionalInterface
     interface Processor {
