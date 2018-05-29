@@ -4,16 +4,19 @@ csv.filename: "clients.csv"
 mariadb:
   datasource:
     driverClassName: org.mariadb.jdbc.Driver
+#    jdbc-url: "jdbc:mysql://dev-bk-bet-dbproc.tsed.orglot.office:3306/gamebet_prod_20180523"
     jdbc-url: "jdbc:mysql://127.0.0.1:3306/test"
-    password: root
+#    username: webdev_adm
+#    password: tao9Gu8Waenotahv
     username: root
+    password: root
 
 sql-server:
   datasource:
     driverClassName: com.microsoft.sqlserver.jdbc.SQLServerDriver
-    jdbc-url: "jdbc:sqlserver://10.60.170.11:1433;database=steklopod"
-    username: root
-    password: root
+    jdbc-url: "jdbc:sqlserver://10.20.170.12:1433;database=steklopodSB2205"
+    username: "nereid1"
+    password: "w62Am951"
 
 spring:
   jpa:
@@ -24,3 +27,5 @@ spring:
     active: steklopod
   datasource:
     continue-on-error: true
+#logging:
+#  file: user-rebase.log

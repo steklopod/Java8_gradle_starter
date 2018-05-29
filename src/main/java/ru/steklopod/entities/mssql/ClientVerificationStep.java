@@ -29,4 +29,13 @@ public class ClientVerificationStep implements Serializable {
     @Column(name = "State")
     private byte state;
 
+    @Transient
+    private Timestamp minimal;
+
+    @Column(name = "Created")
+    private Timestamp created;
+
+//    @Transient
+    @Column(name = "Code")
+    private String code;
 }

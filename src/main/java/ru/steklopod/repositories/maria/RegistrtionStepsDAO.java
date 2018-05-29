@@ -22,9 +22,10 @@ public interface RegistrtionStepsDAO extends JpaRepository<RegistrationSteps, In
             save(registrationStep);
         }catch (Throwable e){
             Starter.countOfStepsRollbacks++;
-            System.err.println("CAN'T SAVE REGISTRATION STEP FOR ID ---> " + registrationStep.getClientId());
+            logger.warn("CAN'T SAVE REGISTRATION STEP FOR ID ---> " + registrationStep.getClientId());
+            logger.info(String.valueOf(registrationStep));
             e.printStackTrace();
-            logger.error(String.valueOf(e.getClass()));
+            logger.error(String.valueOf(e.getMessage()));
         }
     }
 

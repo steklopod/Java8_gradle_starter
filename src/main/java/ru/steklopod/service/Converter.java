@@ -4,42 +4,41 @@ import com.google.common.base.Joiner;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import ru.steklopod.Starter;
 import ru.steklopod.entities.mariadb.UserRebased;
 import ru.steklopod.entities.mssql.Client;
 import ru.steklopod.entities.mssql.ClientVerificationStep;
-import ru.steklopod.repositories.ms.VerificationStepDAO;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.lang.invoke.MethodHandles;
+import java.nio.file.Files;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.*;
+import java.util.stream.Stream;
 
 import static ru.steklopod.Starter.*;
-import static ru.steklopod.service.Checker.isNotInBetTable;
+import static ru.steklopod.service.Checker.checkPhone;
+import static ru.steklopod.service.Checker.makeCountList;
 
 @Service
 public class Converter {
-
     @Value("${csv.filename}")
     private String filename;
     @Autowired
-    private VerificationStepDAO verificationStepDAO;
-
-    public static HashMap<Long, String> regStepsOfTsupisHashMap = new HashMap<>();
+    private RegStepsService regStepsService;
+    public static Map<Long, String> regStepsOfTsupisHashMap = new HashMap<>();
 
     @SneakyThrows
     public UserRebased convertUserForRebase(Client client) {
         Starter.count++;
+        checkPhone(client);
+        makeCountList(client);
         if (Checker.isTrash(client)) {
             return null;
         } else {
@@ -47,16 +46,15 @@ public class Converter {
             String email = client.getEmail();
             String phone = client.getPhone();
             String login = client.getLogin();
-                addGeneralLogins(login);
-                addgeneralPhones(phone);
-                addgeneralEmails(email);
-                addIdToSet(id);
+            addGeneralLogins(login);
+            addgeneralEmails(email);
+            addIdToSet(id);
 
             Optional<String> region = Optional.ofNullable(regionsAlpha3Diction.get(client.getRegion()));
-            Date birthDate = client.getBirthDate();
+
             Timestamp lastModify = client.getLastModify();
             Timestamp registrationDate = client.getRegistrationDate();
-            Long duration = (long) (3600 * 1000);
+            long duration = (long) (3600 * 1000);
             registrationDate.setTime(registrationDate.getTime() + duration);
             String city = client.getCity();
 
@@ -69,12 +67,13 @@ public class Converter {
             String passportIssuer = client.getPassportIssuer();
             String passportIssuerCode = client.getPassportIssuerCode();
             Integer registrationSource = client.getRegistrationSource();
+
             boolean isActive = client.isActive();
             Optional<Integer> notificationOptions = Optional.ofNullable(client.getNotificationOptions());
-
+            Optional<Timestamp> passportDateOption = Optional.ofNullable(client.getPassportDate());
             ExecutorService executor = new ForkJoinPool();
 
-            Callable<ClientVerificationStep> getVerificationStepTask = () -> verificationStepDAO
+            Callable<ClientVerificationStep> getVerificationStepTask = () -> regStepsService
                     .getMaxVerificationStepObject(client.getId());
             Future<ClientVerificationStep> futureMaxStepObj = executor.submit(getVerificationStepTask);
 
@@ -89,7 +88,7 @@ public class Converter {
                         .firstName(firstName)
                         .patronymic(patronymic)
                         .surname(surname)
-                        .birthDate(birthDate)
+                        .birthDate(client.getBirthDate())
                         .addressString(addressString)
                         .birthPlace(birthPlace)
                         .city(city)
@@ -111,19 +110,23 @@ public class Converter {
                 convertAddressToStreet(addressString, userToSave);
                 convertPassport(client.getPassport(), userToSave);
                 convertGender(client.getGender(), userToSave);
-                notificationOptions.ifPresent(o -> convertNotificationOptions(notificationOptions.get(), userToSave));
+                notificationOptions.ifPresent(o -> convertNotificationOptions(o, userToSave));
+                passportDateOption.ifPresent(userToSave::setPassportDate);
                 return userToSave;
             };
             Future<UserRebased> userToSaveInFuture = executor.submit(createUserToSaveTask);
+
             UserRebased userRebased = userToSaveInFuture.get(3, TimeUnit.SECONDS);
 
             Optional<ClientVerificationStep> clientVerificationStep
                     = Optional.ofNullable(futureMaxStepObj.get(3, TimeUnit.SECONDS));
-            clientVerificationStep.ifPresent(x -> setVerificationStepAndOtherParameters(userRebased, clientVerificationStep.get()));
+
+            clientVerificationStep
+                    .ifPresent(x -> setVerificationStepAndOtherParameters(userRebased, x));
 
             executor.shutdown();
 
-            if (isNotInBetTable(userRebased)) {
+            if (Checker.checkNotConfirmedEmail(userRebased)) {
                 return null;
             } else {
                 compareUserWithTsupisCSV(userRebased);
@@ -132,9 +135,17 @@ public class Converter {
         }
     }
 
+
     private void convertNotificationOptions(Integer notificationOptions, UserRebased userRebased) {
+        if (notificationOptions == null) {
+            setNotifications(userRebased, false, false);
+            return;
+        }
         switch (notificationOptions) {
             //Все кроме email // т.е. только sms:
+            case 0:
+                setNotifications(userRebased, true, true);
+                break;
             case 1:
                 setNotifications(userRebased, false, true);
                 break;
@@ -153,8 +164,15 @@ public class Converter {
     }
 
     private void compareUserWithTsupisCSV(UserRebased userRebased) {
+        Long customerId = userRebased.getCustomerId();
+        if (!idsFromBET.contains(customerId)
+                && !regStepsOfTsupisHashMap.containsKey(customerId)) {
+            clearPersonalData(userRebased);
+        }
+
         if (userRebased.isIdentifiedInTsupis()) {
-            String valueOfStepInCSV = regStepsOfTsupisHashMap.get(userRebased.getCustomerId());
+            String valueOfStepInCSV = regStepsOfTsupisHashMap.get(customerId);
+
             if (valueOfStepInCSV != null) {
                 switch (valueOfStepInCSV) {
                     case "":
@@ -171,9 +189,6 @@ public class Converter {
                         break;
                     //email подтвержден:
                     default:
-                        if (!idsFromBET.contains(userRebased.getCustomerId())) {
-                            clearPersonalData(userRebased);
-                        }
                         setTsupisStatuses(userRebased, null, null, (byte) 2, null);
                         break;
                 }
@@ -181,7 +196,7 @@ public class Converter {
         }
     }
 
-    private void setFullVerifiedStage(UserRebased userRebased) {
+    private static void setFullVerifiedStage(UserRebased userRebased) {
         setVerificationStepsToUser(userRebased, 2,
                 true, true, true, true, true);
     }
@@ -194,9 +209,9 @@ public class Converter {
         userRebased.setTsupisAccountStatus(tsupisAccountStatus);
     }
 
-    private void setVerificationStepsToUser(UserRebased userRebased, Integer registrationStageId,
-                                            boolean emailConfirmed, boolean phoneConfirmed, boolean registeredInTsupis,
-                                            boolean identifiedInTsupis, boolean personalityConfirmed) {
+    private static void setVerificationStepsToUser(UserRebased userRebased, Integer registrationStageId,
+                                                   boolean emailConfirmed, boolean phoneConfirmed, boolean registeredInTsupis,
+                                                   boolean identifiedInTsupis, boolean personalityConfirmed) {
         userRebased.setRegistrationStageId(registrationStageId);
         userRebased.setEmailConfirmed(emailConfirmed);
         userRebased.setPhoneConfirmed(phoneConfirmed);
@@ -205,74 +220,85 @@ public class Converter {
         userRebased.setPersonalityConfirmed(personalityConfirmed);
     }
 
-    private void setVerificationStepAndOtherParameters(UserRebased userRebased, ClientVerificationStep
-            clientVerificationStep) {
+    private static void setVerificationStepAndOtherParameters(UserRebased userRebased, ClientVerificationStep clientVerificationStep) {
         Integer partnerMAXStepId = clientVerificationStep.getStep();
 
-        boolean isCompleted = false;
-        if (clientVerificationStep.getState() == 10) {
-            isCompleted = true;
-        }
         switch (partnerMAXStepId) {
             //email:
             case 1:
-                if (isCompleted) {
-                    setVerificationStepsToUser(userRebased, 5,
-                            true, false, false, false, false);
-                } else {
-//                    TODO - stage 1 ?
-                    setVerificationStepsToUser(userRebased, 1,
-                            false, false, false, false, false);
-                }
+                setVerificationStepsToUser(userRebased, 5,
+                        true, false, false, false, false);
+                userRebased.setPersonalDataState((byte) 1);
                 break;
             //цупис:
             case 2:
                 setVerificationStepsToUser(userRebased, 2,
                         true, true, false, false, false);
-                if (isCompleted) {
-                    userRebased.setPersonalDataState((byte) 1);
-                }
+                userRebased.setPersonalDataState((byte) 1);
                 break;
             default:
                 setFullVerifiedStage(userRebased);
+                userRebased.setPersonalDataState((byte) 2);
                 break;
         }
     }
 
     private static void convertPassport(@Nullable String passport, UserRebased userToSave) {
         if (passport != null) {
+            userToSave.setDocumentTypeId(1);
             String seria;
             String passportNumber;
+            String[] split = passport.trim().split("[\\s,;]");
+            String join = Joiner.on("").join(split);
+            passportNumber = passport;
+            seria = null;
             if (passport.contains("passportRus")) {
                 String[] rusPassport = passport.trim().split(";");
-                seria = rusPassport[0];
-                passportNumber = rusPassport[1];
-                userToSave.setDocumentTypeId(1);
+                seria = rusPassport[1];
+                passportNumber = rusPassport[0];
+            } else if (join.length() == 10 && join.matches("[0-9]+")) {
+                seria = join.substring(0, 4);
+                passportNumber = join.substring(4, join.length());
+            } else if (rusPassports.contains(passport)) {
+                if (!passport.contains("passportRus")
+                        || !(join.length() == 10 && join.matches("[0-9]+"))
+                )
+                    if (passport.trim().length() == 11) {
+                        String[] split2 = passport.split("-");
+                        if (split2.length > 1) {
+                            seria = split2[0];
+                            passportNumber = split2[1];
+                        } else {
+                            String[] splitSpace = passport.trim().split("\\s+");
+                            if (splitSpace.length > 1) {
+                                seria = splitSpace[0];
+                                passportNumber = splitSpace[1];
+                            } else {
+                                String[] trimT = passport.trim().split(";");
+                                if (trimT.length > 1) {
+                                    seria = trimT[1];
+                                    passportNumber = trimT[0];
+                                }
+                            }
+                        }
+                    } else {
+                        String[] trimC = passport.trim().split(";");
+                        if (trimC.length > 1) {
+                            seria = trimC[1];
+                            passportNumber = trimC[0];
+                        }
+                        String trim = passport.replaceAll("\\s+", "").trim();
+                        if (trim.length() == 10) {
+                            seria = join.substring(0, 4);
+                            passportNumber = join.substring(4, join.length());
+                        }
+                    }
             } else {
-                String[] split = passport.trim().split("[\\s,;]");
-                String join = Joiner.on("").join(split);
-
-                if (join.length() == 10 && join.matches("[0-9]+")) {
-                    seria = join.substring(0, 4);
-                    passportNumber = join.substring(4, join.length());
-                    userToSave.setDocumentTypeId(1);
-                } else {
-                    passportNumber = passport;
-                    seria = null;
-                    userToSave.setDocumentTypeId(2);
-                    Starter.countOfNotRusPassports++;
-                }
+                userToSave.setDocumentTypeId(2);
+                Starter.countOfNotRusPassports.getAndIncrement();
             }
             userToSave.setPassportSeries(seria);
             userToSave.setPassportNumber(passportNumber);
-
-//            if (passportNumber.length() < 11) {
-//                userToSave.setPassportNumber(passportNumber);
-//            } else {
-//                userToSave.setDocumentTypeId(2);
-//                Starter.countOfNotRusPassports++;
-////                userToSave.setDocumentTypeId(2);
-//            }
         }
     }
 
@@ -291,36 +317,47 @@ public class Converter {
 
     private static void convertCitizenship(boolean citizenship, UserRebased userToSave) {
         String s = null;
+        userToSave.setResident(citizenship);
         if (citizenship) {
             s = "RUS";
         }
         userToSave.setCitizenship(s);
     }
 
-    private static void convertGender(@Nullable Integer gender, UserRebased user) {
+    private static void convertGender(Integer gender, UserRebased user) {
         if (gender == null) {
             user.setGender(1);
         } else {
             switch (gender) {
-                case 2:
+                case 1:
                     user.setGender(1);
                     break;
-                case 3:
+                case 2:
                     user.setGender(2);
                     break;
+                default:
+                    user.setGender(1);
             }
         }
     }
 
     public void fillHasMapOfSteps() {
-        Resource resource = new FileSystemResource(filename);
-        try (InputStream is = resource.getInputStream()) {
-            new BufferedReader(new InputStreamReader(is, "UTF-8")).lines()
+//        TODO - изменить при построении JAR-файла
+//            Resource resource = new FileSystemResource(filename);
+//            try (InputStream is = resource.getInputStream()) {
+//                new BufferedReader(new InputStreamReader(is, "UTF-8")).lines()
+
+        File file = new File(MethodHandles
+                .lookup()
+                .lookupClass()
+                .getClassLoader().getResource(filename).getFile());
+        try (Stream<String> stream = Files.lines(file.toPath())) {
+            stream
                     .skip(1)
                     .forEach(row -> {
                         String[] strings = row.split(";");
                         Long customerId = Long.parseLong(strings[0]);
-                        String step = strings[2];
+                        String step = strings[1];
                         regStepsOfTsupisHashMap.put(customerId, step);
                     });
         } catch (NullPointerException | IOException e) {
@@ -331,10 +368,7 @@ public class Converter {
 
     private void clearPersonalData(UserRebased userRebased) {
         countOfUsersWithoutPersonalData++;
-
         userRebased.setMigrationState((byte) 2);
-        userRebased.setFirstName(null);
-
         userRebased.setBirthDate(null);
         userRebased.setBirthPlace(null);
 

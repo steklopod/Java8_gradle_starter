@@ -14,7 +14,6 @@ public interface RegionDao extends JpaRepository<Region, Integer> {
             "FROM Region\n" +
             "WHERE Id = ?1 AND Alpha3Code IS NOT NULL";
 
-//   TODO - переделать на inMemory
     @Query(value = GET_REGISTRATION_STAGE, nativeQuery = true)
     String getRegion(Integer clientId);
 

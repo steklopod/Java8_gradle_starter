@@ -47,12 +47,13 @@ public class MsSQLConfig {
 
         lef.setPackagesToScan("ru.steklopod.entities.mssql");
         Properties properties = new Properties();
-        properties.setProperty("hibernate.format_sql", "true");
+//        properties.setProperty("hibernate.format_sql", "true");
+//        properties.setProperty("hibernate.show_sql", "true");
+        properties.setProperty("hibernate.dialect", "org.hibernate.dialect.SQLServerDialect");
         properties.setProperty("hibernate.connection.shutdown", "true");
         properties.setProperty("hibernate.classloading.use_current_tccl_as_parent", "false");
         properties.setProperty("hibernate.proc.param_null_passing", "true");
 //        properties.setProperty("hibernate.temp.use_jdbc_metadata_defaults", "false");
-
         properties.setProperty("hibernate.hbm2ddl.auto", "none");
         lef.setJpaProperties(properties);
         lef.afterPropertiesSet();

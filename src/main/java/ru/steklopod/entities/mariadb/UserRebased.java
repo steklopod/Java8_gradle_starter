@@ -10,7 +10,6 @@ import org.springframework.lang.Nullable;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Entity
 @Table(name = "user")
@@ -19,6 +18,7 @@ import java.util.Date;
 @Data
 @Builder
 public class UserRebased implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -35,7 +35,7 @@ public class UserRebased implements Serializable {
     private String password;
 
     @Column(name = "registration_stage_id",columnDefinition = "TINYINT(4)")
-    @NonNull
+//    @NonNull
     private Integer registrationStageId;
 
     @Nullable
@@ -44,10 +44,9 @@ public class UserRebased implements Serializable {
 //    @Column(columnDefinition = "TINYINT(1) default '0'")
     private Boolean blocked;
 
-    @Column(name = "registration_date", columnDefinition = "datetime")
+    @Column(name = "registration_date" /*, columnDefinition = "datetime"*/)
     @Nullable
     private Timestamp registrationDate;
-
 
     @Column(name = "last_modify")
     @Nullable
@@ -64,7 +63,7 @@ public class UserRebased implements Serializable {
     @Column(name = "birth_date")
     @Temporal(TemporalType.DATE)
     @Nullable
-    private Date birthDate;
+    private java.util.Date birthDate;
 
     @Column(name = "first_name")
     @Nullable
@@ -78,6 +77,8 @@ public class UserRebased implements Serializable {
 
     @Nullable
     private String citizenship;
+
+    private Boolean resident;
 
     @Column(name = "address_string", columnDefinition = "TEXT")
     @Nullable
@@ -133,13 +134,12 @@ public class UserRebased implements Serializable {
     @Nullable
     private String passportIssuerCode;
 
-    @Column(name = "passport_date", columnDefinition = "VARCHAR(50)")
-    @Temporal(TemporalType.DATE)
+    @Column(name = "passport_date")
     @Nullable
-    private Date passportDate;
+    private Timestamp passportDate;
 
     @Column(name = "customer_id", columnDefinition = "BIGINT(20)")
-    @Nullable
+//    @Nullable
     private Long customerId;
 
     @Column(name = "swarm_user_id", columnDefinition = "BIGINT(20)")
@@ -264,7 +264,7 @@ public class UserRebased implements Serializable {
     @Nullable
     private Byte personalDataState;
 
-    @Column(name = "registration_source")
+    @Column(name = "reg_source")
     private Integer registrationSource;
 
     @Column(name = "notify_email")

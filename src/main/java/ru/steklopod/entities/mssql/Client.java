@@ -3,10 +3,12 @@ package ru.steklopod.entities.mssql;
 import lombok.Data;
 import org.springframework.lang.Nullable;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.util.Date;
 
 @Entity
 @Table(name = "Client")
@@ -58,8 +60,8 @@ public class Client implements Serializable {
     private Integer gender;
 
     @Column(name = "BirthDate")
-    @Temporal(TemporalType.DATE)
-    private Date birthDate;
+//    @Temporal(TemporalType.DATE)
+    private java.util.Date birthDate;
 
     @Column(name = "FirstName")
     private String firstName;
@@ -98,6 +100,10 @@ public class Client implements Serializable {
     @Column(name = "DocIssuedBy")
     @Nullable
     private String passportIssuer;
+
+    @Column(name = "DocIssueDate")
+    @Nullable
+    private Timestamp passportDate;
 
     @Column(name = "DocIssueCode")
     @Nullable
