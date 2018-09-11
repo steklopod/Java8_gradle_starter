@@ -12,7 +12,7 @@ buildscript {
         maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.4.RELEASE")
         classpath "com.kncept.junit5.reporter:junit-reporter:1.2.0"
         classpath "com.github.ben-manes:gradle-versions-plugin:0.20.0"// dependencyUpdates
         classpath "org.junit.platform:junit-platform-gradle-plugin:1.2.0"

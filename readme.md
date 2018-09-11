@@ -36,3 +36,9 @@
 [Инструкцйия по установке плагинов](https://github.com/shiraji/plugin-importer-exporter) `plugins.json`.
 
 Чтобы узнать актуальные версии библиотек необходимо запустить таску gradle: `help` -> `dependencyUpdates`
+
+#### Чтобы убить процесс на порту 8080 (Windows):
+```
+1. netstat -ano | findstr 8080
+2. taskkill /pid @НОМЕР_ПОРТА@ /F
+``` 
