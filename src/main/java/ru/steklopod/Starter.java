@@ -11,9 +11,7 @@ public class Starter extends SpringBootServletInitializer {
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         return application.sources(Starter.class);
     }
-
     public static void main(String[] args) {
         SpringApplication.run(Starter.class, args);
     }
-
 }
