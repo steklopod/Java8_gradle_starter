@@ -1,19 +1,4 @@
 
-postgres:
-  datasource:
-    driverClassName: org.postgresql.Driver
-    jdbc-url: "jdbc:postgresql://localhost:5432/home"
-    password: postgres
-    username: postgres
 
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: create
-      use-new-id-generator-mappings: true
-#    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    show-sql: false
-  profiles:
-    active: steklopod
-  datasource:
-    continue-on-error: true
+server:
+  port: 8085

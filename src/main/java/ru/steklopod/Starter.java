@@ -1,14 +1,19 @@
 package ru.steklopod;
 
-import org.springframework.stereotype.Component;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
-@Component
-public class Starter
-//        implements CommandLineRunner
-{
-
-//    @Override
-    public void run(String... args) throws Exception {
-        System.err.println("Hello");
+@SpringBootApplication
+public class Starter extends SpringBootServletInitializer {
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        return application.sources(Starter.class);
     }
+
+    public static void main(String[] args) {
+        SpringApplication.run(Starter.class, args);
+    }
+
 }
