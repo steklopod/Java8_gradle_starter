@@ -4,8 +4,10 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,9 +25,12 @@ public class RarProducer {
     }
 
     //Метод, возвращающий .rar-архив из того же каталога, где находится jar-файл
-    @GetMapping(value = "/getArchive", produces = "application/zip")
-    public FileSystemResource getRarFromJar() {
-        File file = new File(new ClassPathResource(filename).getPath());
+    @GetMapping(value = "/Public/Downloads/Actual/{fileName}", produces = "application/zip")
+    public FileSystemResource getRarFromJar(@PathVariable("fileName") String fileName, HttpServletResponse response) {
+        String filenameWhichWillBeSend  = "fias_dbf.rar";
+        File file = new File(new ClassPathResource(fileName).getPath());
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + filenameWhichWillBeSend + "\"");
         return new FileSystemResource(file);
     }
 }
