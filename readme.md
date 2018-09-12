@@ -4,41 +4,56 @@
 
 В одном из бранчей находится пример работы с 2-мя БД: в качестве системы отправителя используется `MSSQL` server, а в 
 качестве системы получателя приведен пример работы с БД типом `MariaDB`. Унифицировать работу с данными позволяет 
-`Object Relationship Mapping (ORM)`, а точнее его реализация `JPA` от компании `Pivotal`, одной из ее дочерних компаний - `Spring`. 
+[Object-Relationa (ORM)](https://ru.wikipedia.org/wiki/ORM), а точнее его реализация [Java Persistence (JPA)](https://ru.wikipedia.org/wiki/Java_Persistence_API) 
+от компании `Pivotal`, одной из ее дочерних компаний - [Spring](http://projects.spring.io/spring-data/). 
 
-В данном примере показана работа с фреймворком Spring Data.
-
-+ Gradle
-
-+ Postgres
-
-+ Spring Boot 2.0
+В данном проекте находятся скелетоны для быстрого стартк на Spring Data/Web.
 
 ---
 
-#### СБОРКА:
-> A. Пароль и логин для БД проиписывается в папке ...\user-rebase\src\main\resources ,
-в файле application.yml.
+### REST-сервер, отправляющий .rar-архив из папки, где находится jar
 
-> Б. Необходимо, чтобы был установлен Gradle, в коммандной строке вводятся команды:
+> Сборка
 
-```groovy
-1. `cd C:\Users\steklopod\...\user-app`
+* Пароль/логин/port и др. конфигурации проиписываются в файле `application.yml`, который находится в папке `...src\main\resources`.
+[Подробнее о формате YAML](https://ru.wikipedia.org/wiki/YAML)
 
-2. `gradle bootJar`
+* Необходимо, чтобы был установлен [Gradle](https://gradle.org/install/), в коммандной строке вводится:
 
-3. `cd build/libs`
-
-4. `java -jar user-app-1.0.jar`
+```jshelllanguage
+     cd C:\Users\...\Java8_gradle_starter
+    
+     gradle bootJar
+    
 ```
 
-В папке `..\starter-post\src\test\resources` находятся **настройки Idea** `intellij_settings.jar` и используемые плагины.
-[Инструкцйия по установке плагинов](https://github.com/shiraji/plugin-importer-exporter) `plugins.json`.
+После построения jar-файла по пути `build/libs` будет создан исполняемый jar-файл `server-1.0.jar`.
 
-Чтобы узнать актуальные версии библиотек необходимо запустить таску gradle: `help` -> `dependencyUpdates`
+> Запуск
+
+Необходимо через командную строку зайти в каталог с jar-файлом (`build/libs`), поместить в этот же каталог `.rar-архив` с именем
+
+`archive.rar` и выполнить след. команду:
+
+```jshelllanguage
+
+    cd build/libs
+        
+    java -jar server-1.0.jar
+```
+
+Чтобы скачать архив необходимо через браузер зайти на адрес `localhost:8085/getArchive`
+
+___
+
+#### Gradle Versions Plugin - Актуальные версии библиотек
+
+Чтобы узнать актуальность версий с помощью плагина [Gradle Versions Plugin](https://github.com/ben-manes/gradle-versions-plugin) 
+библиотек необходимо запустить таску gradle: `help` -> `dependencyUpdates`
 
 #### Чтобы убить процесс на порту 8080 (Windows):
 ```
-1. netstat -ano | findstr 8080
+1. netstat -ano | findstr 8085
 2. taskkill /pid @НОМЕР_ПОРТА@ /F
 ``` 
+
