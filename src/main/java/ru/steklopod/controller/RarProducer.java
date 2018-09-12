@@ -1,0 +1,32 @@
+package ru.steklopod.controller;
+
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+@RestController
+public class RarProducer {
+
+    private String filename = "archive.rar";
+
+    //Метод для теста из IDE, возвращающий .rar-архив из того же каталога, где находится jar-файл
+    @GetMapping(value = "/getRar", produces = "application/zip")
+    public InputStreamResource getRarFromIntellij() throws FileNotFoundException {
+        File file = new File(filename);
+        return new InputStreamResource(new FileInputStream(file));
+    }
+
+    //Метод, возвращающий .rar-архив из того же каталога, где находится jar-файл
+    @GetMapping(value = "/getArchive", produces = "application/zip")
+    public FileSystemResource getRarFromJar() {
+        File file = new File(new ClassPathResource(filename).getPath());
+        return new FileSystemResource(file);
+    }
+}
+
