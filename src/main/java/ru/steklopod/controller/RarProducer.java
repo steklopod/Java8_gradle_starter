@@ -15,19 +15,19 @@ import java.io.FileNotFoundException;
 @RestController
 public class RarProducer {
 
-    private String filename = "archive.rar";
+    private String rarFile = "archive.rar";
 
     //Метод для теста из IDE, возвращающий .rar-архив из того же каталога, где находится jar-файл
     @GetMapping(value = "/getRar", produces = "application/zip")
     public InputStreamResource getRarFromIntellij() throws FileNotFoundException {
-        File file = new File(filename);
+        File file = new File( getClass().getClassLoader().getResource(rarFile).getPath());
         return new InputStreamResource(new FileInputStream(file));
     }
 
     //Метод, возвращающий .rar-архив из того же каталога, где находится jar-файл
     @GetMapping(value = "/Public/Downloads/Actual/{fileName}", produces = "application/zip")
     public FileSystemResource getRarFromJar(@PathVariable("fileName") String fileName, HttpServletResponse response) {
-        String filenameWhichWillBeSend  = "fias_dbf.rar";
+        String filenameWhichWillBeSend  = "some_rar_file.rar";
         File file = new File(new ClassPathResource(fileName).getPath());
         response.setStatus(HttpServletResponse.SC_OK);
         response.setHeader("Content-Disposition", "attachment; filename=\"" + filenameWhichWillBeSend + "\"");
