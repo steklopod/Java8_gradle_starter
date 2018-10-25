@@ -1,4 +1,4 @@
-package ru.steklopod;
+package ru.steklopod.semaphore;
 
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
