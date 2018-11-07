@@ -13,9 +13,8 @@ class StarterTest {
 
     @Test
     void первый() {
-
+        System.out.println("Hello");
     }
-
 
 }
 
