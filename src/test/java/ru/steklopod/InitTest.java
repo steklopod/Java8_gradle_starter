@@ -26,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+//@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 class InitTest {
 
     @Autowired
@@ -40,7 +41,7 @@ class InitTest {
 
     @Test
      void getAccount() throws Exception {
-        mockMvc.perform(get("/getArchive"))
+        mockMvc.perform(get("/getRar"))
                 .andExpect(status().isOk());
     }
 }
