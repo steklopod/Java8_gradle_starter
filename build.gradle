@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        springBootVersion = '2.1.0.M2'
+        springBootVersion = '2.1.0.RELEASE'
     }
     repositories {
         jcenter()
@@ -12,7 +12,7 @@ buildscript {
         maven { url "https://jitpack.io" }
     }
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.4.RELEASE")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.0.RELEASE")
         classpath "com.kncept.junit5.reporter:junit-reporter:1.2.0"
         classpath "com.github.ben-manes:gradle-versions-plugin:0.20.0"// dependencyUpdates
         classpath "org.junit.platform:junit-platform-gradle-plugin:1.2.0"
@@ -24,6 +24,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.6.RELEASE'
 }
 
+apply plugin: 'application'
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'maven'
@@ -33,24 +34,25 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'com.kncept.junit5.reporter'
 apply plugin: "com.github.ManifestClasspath"
 apply plugin: 'com.github.ben-manes.versions'
-apply plugin: 'org.junit.platform.gradle.plugin'
 //apply plugin: 'war'
 
-group = 'ru.steklopod'
-version = '1.0'
-archivesBaseName = 'server'
+jar {
+    baseName = 'server'
+    version = '1.0'
+}
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
 ext {
     assertJVersion = '3.11.1'
     junitJupiterVersion = '5.3.1'
     junitPlatformVersion = '1.3.1'
     junitVintageVersion = '5.1.0'
     lombokVersion = '1.18.2'
-    springBootVersion = '2.1.0.M2'
+    springBootVersion = '2.1.0.RELEASE'
     JUNIT_VERSION = '4.12'
 }
-ext['spring.version'] = '5.0.4.RELEASE'
 
 repositories {
     mavenCentral()
@@ -62,8 +64,6 @@ repositories {
 }
 
 dependencies {
-//    compile project(':site-model')
-
     compile("org.springframework.boot:spring-boot-starter",
             "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}",
             "org.projectlombok:lombok:${lombokVersion}",
@@ -75,7 +75,6 @@ dependencies {
             "org.tuxdude.logback.extensions:logback-colorizer:1.0.1",
             "me.tongfei:progressbar:0.7.1",
             "org.apache.commons:commons-lang3:3.8",
-            // https://mvnrepository.com/artifact/org.apache.commons/commons-io
              "org.apache.commons:commons-io:1.3.2"
     )
 
