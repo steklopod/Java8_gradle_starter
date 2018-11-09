@@ -20,9 +20,9 @@ buildscript {
         classpath "gradle.plugin.com.github.viswaramamoorthy:gradle-util-plugins:0.1.0-RELEASE" //long class-path fixing
     }
 }
-//plugins {
-//    id 'io.spring.dependency-management' version '1.0.6.RELEASE'
-//}
+plugins {
+    id 'io.spring.dependency-management' version '1.0.6.RELEASE'
+}
 
 apply plugin: 'application'
 apply plugin: 'java'
@@ -40,7 +40,7 @@ apply plugin: 'org.junit.platform.gradle.plugin'
 //apply plugin: 'war'
 
 jar {
-    baseName = 'REST '
+    baseName = 'REST'
     version = '0.1'
 }
 

@@ -25,7 +25,7 @@ public class RarProducer {
     }
 
     //Метод, возвращающий .rar-архив из того же каталога, где находится jar-файл
-    @GetMapping(value = "/Public/Downloads/Actual/{fileName}", produces = "application/zip")
+    @GetMapping(value = "/getRar/{fileName}", produces = "application/zip")
     public FileSystemResource getRarFromJar(@PathVariable("fileName") String fileName, HttpServletResponse response) {
         String filenameWhichWillBeSend  = "some_rar_file.rar";
         File file = new File(new ClassPathResource(fileName).getPath());
