@@ -27,7 +27,7 @@ class Interfaces {
     @Test
         //Function<T,R> - переход от объекта типа T к объекту типа R:
     void FUNCTION() {
-        Function<Integer, Double> celsiyToFahrenheitInt = x -> new Double((x * 9 / 5) + 32);
+        Function<Integer, Double> celsiyToFahrenheitInt = x -> (double) ((x * 9 / 5) + 32);
         Function<String, Integer> stringToInt = Integer::valueOf;
 
         System.out.println("Centigrade to Fahrenheit: " + celsiyToFahrenheitInt.apply(36));
@@ -49,7 +49,8 @@ class Interfaces {
         System.err.println(
                 Stream.of(" a ", " b ")
                         .map(
-                                trimFunction.andThen(toUpperCaseFunction)
+                                trimFunction
+                                        .andThen(toUpperCaseFunction)
                         )
         );// Stream is now ["A", "B"]
     }
@@ -62,7 +63,6 @@ class Interfaces {
 
         printer.accept(600); // 600 долларов
     }
-
 
 
     @Test

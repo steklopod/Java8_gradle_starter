@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BinaryOperator;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
@@ -23,7 +24,8 @@ import java.util.function.UnaryOperator;
 @ExtendWith({SpringExtension.class, RandomBeansExtension.class})
 class AndThen {
 
-    @Test                  //Function<T,R> - переход от объекта типа T к объекту типа R:
+    @Test
+        //Function<T,R> - переход от объекта типа T к объекту типа R:
     void functionAndThen() {
         Function<Integer, Integer> f1 = i -> i * 4;
         Function<Integer, Integer> f2 = i -> i + 4;
@@ -82,7 +84,6 @@ class AndThen {
     }
 
 
-
     @Test
     void consumerChain() {
         List<Student> students = Arrays.asList(
@@ -90,7 +91,7 @@ class AndThen {
                 new Student(2, 4, "Jane"),
                 new Student(3, 3, "Jack"));
 
-        java.util.function.Consumer<Student> raiser = e -> e.gpa = e.gpa * 1.1;
+        Consumer<Student> raiser = e -> e.gpa = e.gpa * 1.1;
 
         raiseStudents(students, raiser.andThen(System.out::println));
 
@@ -102,20 +103,18 @@ class AndThen {
     @Data
     @AllArgsConstructor
     class Student {
-        public int id;
-        public double gpa;
-        public String name;
+        int id;
+        double gpa;
+        String name;
     }
 
-    private static void raiseStudents(List<Student> employees, java.util.function.Consumer<Student> fx) {
+    private static void raiseStudents(List<Student> employees, Consumer<Student> fx) {
 // 1 вариант:
 //        for (Student e : employees) { fx.accept(e); }
 // 2 вариант:
 //        employees.forEach(x -> fx.accept(x));
 // 3 вариант:
-        employees.forEach(fx::accept);
-// 4 вариант:
-//        employees.forEach(fx);
+        employees.forEach(fx);
     }
 
 
