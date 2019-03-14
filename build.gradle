@@ -1,7 +1,7 @@
 plugins {
     id "java"
     id "org.springframework.boot" version "2.1.3.RELEASE"
-    id "io.spring.dependency-management" version "1.0.6.RELEASE"
+    id "io.spring.dependency-management" version "1.0.7.RELEASE"
     id "com.github.ben-manes.versions" version "0.21.0"
 }
 
@@ -31,11 +31,12 @@ dependencies {
     implementation("com.h2database:h2:1.4.199") // "org.postgresql:postgresql:42.2.2"
 
     compileOnly("org.projectlombok:lombok")
+    testCompileOnly ("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
 
+    testImplementation("org.springframework.boot:spring-boot-starter-test") { exclude module: "junit" }
     testImplementation(
             "org.junit.jupiter:junit-jupiter-api",
-            "org.springframework.boot:spring-boot-starter-test",
             "io.github.benas:random-beans:3.8.0",
             "io.github.glytching:junit-extensions:2.3.0"
     )
