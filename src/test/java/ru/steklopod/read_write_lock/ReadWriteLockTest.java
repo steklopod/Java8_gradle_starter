@@ -1,8 +1,6 @@
 package ru.steklopod.read_write_lock;
 
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +11,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static java.lang.Thread.sleep;
 
-@RunWith(JUnitPlatform.class)
 class ReadWriteLockTest {
 
     @Test

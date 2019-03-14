@@ -2,12 +2,9 @@ package ru.steklopod.semaphore;
 
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 
-@RunWith(JUnitPlatform.class)
 class SemaphoreTest {
     //Парковочное место занято - true, свободно - false
     private static final boolean[] PARKING_PLACES = new boolean[5];

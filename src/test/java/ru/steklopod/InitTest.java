@@ -2,13 +2,10 @@ package ru.steklopod;
 
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
 import lombok.extern.slf4j.Slf4j;
-import name.falgout.jeffrey.testing.junit.mockito.MockitoExtension;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,11 +19,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Slf4j
 @SpringBootTest
-@RunWith(JUnitPlatform.class)
-@ExtendWith({MockitoExtension.class, SpringExtension.class, RandomBeansExtension.class})
+@ExtendWith({ SpringExtension.class, RandomBeansExtension.class})
 @AutoConfigureMockMvc
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-//@EnableAutoConfiguration(exclude={DataSourceAutoConfiguration.class})
 class InitTest {
 
     @Autowired

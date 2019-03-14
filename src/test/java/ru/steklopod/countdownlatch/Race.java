@@ -2,12 +2,9 @@ package ru.steklopod.countdownlatch;
 
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.junit.platform.runner.JUnitPlatform;
-import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 
-@RunWith(JUnitPlatform.class)
 class Race {
     //Создаем CountDownLatch на 8 "условий"
     private static final CountDownLatch START = new CountDownLatch(8);
