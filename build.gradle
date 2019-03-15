@@ -22,19 +22,18 @@ dependencies {
             "org.springframework.boot:spring-boot-starter",
             "org.springframework.boot:spring-boot-starter-web",
             "org.springframework.boot:spring-boot-starter-security",
-            "org.springframework.boot:spring-boot-starter-data-rest",
-            "org.springframework.boot:spring-boot-starter-data-jpa",
+            "org.springframework.boot:spring-boot-starter-data-jpa"
+    )
 
+    implementation(
+            "org.springframework.boot:spring-boot-starter-thymeleaf",
             "org.tuxdude.logback.extensions:logback-colorizer:1.0.1"
     )
 
-    implementation("com.h2database:h2:1.4.199") // "org.postgresql:postgresql:42.2.2"
-
-    compileOnly("org.projectlombok:lombok")
-    testCompileOnly ("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
+    implementation("com.h2database:h2:1.4.199") // implementation("org.postgresql:postgresql:42.2.2")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test") { exclude module: "junit" }
+
     testImplementation(
             "org.junit.jupiter:junit-jupiter-api",
             "io.github.benas:random-beans:3.8.0",
@@ -42,6 +41,10 @@ dependencies {
     )
 
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+
+    compileOnly("org.projectlombok:lombok")
+    testCompileOnly("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
 }
 
 test {
