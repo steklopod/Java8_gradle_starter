@@ -1,7 +1,6 @@
 package ru.steklopod;
 
 import io.github.glytching.junit.extension.random.RandomBeansExtension;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -17,7 +16,6 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Slf4j
 @SpringBootTest
 @ExtendWith({ SpringExtension.class, RandomBeansExtension.class})
 @AutoConfigureMockMvc
