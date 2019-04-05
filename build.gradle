@@ -27,7 +27,9 @@ dependencies {
 
     implementation(
             "org.springframework.boot:spring-boot-starter-thymeleaf",
-            "org.tuxdude.logback.extensions:logback-colorizer:1.0.1"
+            "org.tuxdude.logback.extensions:logback-colorizer:1.0.1",
+            "joda-time:joda-time:2.10.1"
+
     )
 
     implementation("com.h2database:h2:1.4.199") // implementation("org.postgresql:postgresql:42.2.2")
