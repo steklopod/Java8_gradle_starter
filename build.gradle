@@ -1,6 +1,6 @@
 plugins {
     id "java"
-    id "org.springframework.boot" version "2.1.3.RELEASE"
+    id "org.springframework.boot" version "2.1.4.RELEASE"
     id "io.spring.dependency-management" version "1.0.7.RELEASE"
     id "com.github.ben-manes.versions" version "0.21.0"
 }
@@ -17,36 +17,38 @@ repositories {
 }
 
 dependencies {
+    // Boot
     implementation(
-            "org.springframework.boot:spring-boot-dependencies:2.1.3.RELEASE",
             "org.springframework.boot:spring-boot-starter",
-            "org.springframework.boot:spring-boot-starter-web",
-            "org.springframework.boot:spring-boot-starter-security",
-            "org.springframework.boot:spring-boot-starter-data-jpa"
+            "org.springframework.boot:spring-boot-starter-web"
     )
-
     implementation(
             "org.springframework.boot:spring-boot-starter-thymeleaf",
-            "org.tuxdude.logback.extensions:logback-colorizer:1.0.1",
-            "joda-time:joda-time:2.10.1"
-
+            "org.springframework.boot:spring-boot-starter-security"
     )
 
-    implementation("com.h2database:h2:1.4.199") // implementation("org.postgresql:postgresql:42.2.2")
+    //DataBase
+    implementation("com.h2database:h2")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    // implementation("org.postgresql:postgresql:42.2.2")
 
+    // Tests
     testImplementation("org.springframework.boot:spring-boot-starter-test") { exclude module: "junit" }
-
     testImplementation(
             "org.junit.jupiter:junit-jupiter-api",
             "io.github.benas:random-beans:3.8.0",
             "io.github.glytching:junit-extensions:2.3.0"
     )
-
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
+    // Lombok
     compileOnly("org.projectlombok:lombok")
     testCompileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
+
+    // Other
+    implementation("org.jetbrains:annotations:17.0.0")
+    implementation("org.tuxdude.logback.extensions:logback-colorizer:1.0.1")
 }
 
 test {
